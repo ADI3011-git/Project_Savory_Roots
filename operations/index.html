@@ -1,17 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SavoryRoots - Operations Control Tower</title>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
-  <!-- SheetJS (XLSX reader) -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SavoryRoots - Operations Control Tower</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<!-- SheetJS (XLSX reader) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
     :root{
       --primary:#2c5530;
       --secondary:#739e82;
@@ -174,308 +172,295 @@
       .chart-card{height:360px;}
       .chart-wrap{height:300px;}
     }
-  </style>
+  
+
+/* --- Global cross-dashboard navigation --- */
+.global-nav{position:sticky;top:0;z-index:200;background:#ffffff;border-bottom:1px solid rgba(0,0,0,.08)}
+.global-nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px}
+.global-nav .brand{font-weight:900;color:#2c5530;text-decoration:none;letter-spacing:.2px}
+.global-links{display:flex;flex-wrap:wrap;gap:10px}
+.g-link{padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:700;color:#2c5530;background:#f1f8e9;border:1px solid rgba(44,85,48,.12)}
+.g-link:hover{background:#e8f5e8}
+.g-link.active{background:#2c5530;color:#fff;border-color:#2c5530}
+@media (max-width:900px){.global-nav-inner{flex-direction:column;align-items:flex-start}.global-links{width:100%}}
+</style>
 </head>
-
 <body>
-  <div class="container">
-    <header>
-      <div class="header-content">
-        <div class="logo">
-          <i class="fas fa-industry"></i>
-          <div>
-            <h1>Savory<span>Roots</span></h1>
-            <div class="subtitle">Operations Control Tower | MPS • RCCP • Schedule • OEE • Scenarios</div>
-          </div>
-        </div>
+<nav class="global-nav">
+<div class="global-nav-inner">
+<a class="brand" href="main-dashboard.html">SavoryRoots</a>
+<div class="global-links">
+<a class="g-link" href="main-dashboard.html">Main</a>
+<a class="g-link" href="sourcing.html">Sourcing</a>
+<a class="g-link" href="forecasting_embedded_models.html">Forecasting</a>
+<a class="g-link active" href="ops6_globalnav.html">Operations</a>
+<a class="g-link" href="inventory-warehousing.html">Inventory &amp; Warehousing</a>
+<a class="g-link" href="delivery.html">Delivery</a>
+</div>
+</div>
+</nav>
 
-        <div class="header-actions">
-          <div class="pill">
-            <i class="fas fa-calendar-week"></i>
+<div class="container">
+<header>
+<div class="header-content">
+<div class="logo">
+<i class="fas fa-industry"></i>
+<div>
+<h1>Savory<span>Roots</span></h1>
+<div class="subtitle">Operations Control Tower | MPS • RCCP • Schedule • OEE • Scenarios</div>
+</div>
+</div>
+<div class="header-actions">
+<div class="pill">
+<i class="fas fa-calendar-week"></i>
             Week:
             <select id="weekSelectTop">
-              <option value="1" selected>Week 1</option>
-              <option value="2">Week 2</option>
-              <option value="3">Week 3</option>
-              <option value="4">Week 4</option>
-              <option value="5">Week 5</option>
-            </select>
-          </div>
-
-          <div class="pill">
-            <i class="fas fa-flask"></i>
+<option selected="" value="1">Week 1</option>
+<option value="2">Week 2</option>
+<option value="3">Week 3</option>
+<option value="4">Week 4</option>
+<option value="5">Week 5</option>
+</select>
+</div>
+<div class="pill">
+<i class="fas fa-flask"></i>
             Scenario:
             <select id="scenarioSelectTop">
-              <option value="S0_Base" selected>S0 Base</option>
-              <option value="S1_DemandPlus20">S1 Demand +20%</option>
-              <option value="S2_NoOvertime">S2 No Overtime</option>
-              <option value="S3_YogurtYieldDrop">S3 Yogurt Yield Drop</option>
-            </select>
+<option selected="" value="S0_Base">S0 Base</option>
+<option value="S1_DemandPlus20">S1 Demand +20%</option>
+<option value="S2_NoOvertime">S2 No Overtime</option>
+<option value="S3_YogurtYieldDrop">S3 Yogurt Yield Drop</option>
+</select>
+</div>
+<div class="pill clickable" onclick="window.location.href='../index.html'">
+<i class="fas fa-home"></i> Main Dashboard
           </div>
-
-          <div class="pill clickable" onclick="window.location.href='../index.html'">
-            <i class="fas fa-home"></i> Main Dashboard
-          </div>
-        </div>
-      </div>
-
-      <div class="dashboard-nav">
-        <a href="#overview" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Overview</a>
-        <a href="#demandMps" class="nav-item"><i class="fas fa-chart-line"></i> Demand → MPS</a>
-        <a href="#capacity" class="nav-item"><i class="fas fa-clock"></i> Capacity</a>
-        <a href="#schedule" class="nav-item"><i class="fas fa-calendar-alt"></i> Schedule</a>
-        <a href="#oee" class="nav-item"><i class="fas fa-gauge-high"></i> OEE</a>
-        <a href="#scenarios" class="nav-item"><i class="fas fa-random"></i> Scenarios</a>
-        <a href="#downloads" class="nav-item"><i class="fas fa-download"></i> Downloads</a>
-      </div>
-    </header>
-
-    <!-- OVERVIEW -->
-    <section id="overview">
-      <div class="section-header">
-        <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Control Tower Overview</h2>
-        <div class="badge">Live filters</div>
-      </div>
-
-      <div class="grid-4">
-        <div class="card kpi">
-          <div class="kpi-left">
-            <div class="kpi-title">Demand (Units)</div>
-            <div class="kpi-value" id="kpiDemand">—</div>
-            <div class="kpi-sub">Selected week • selected scenario</div>
-          </div>
-          <div class="kpi-icon"><i class="fas fa-bullseye"></i></div>
-        </div>
-
-        <div class="card kpi">
-          <div class="kpi-left">
-            <div class="kpi-title">Good Output (Est.)</div>
-            <div class="kpi-value" id="kpiGood">—</div>
-            <div class="kpi-sub">Post-yield estimate</div>
-          </div>
-          <div class="kpi-icon"><i class="fas fa-box"></i></div>
-        </div>
-
-        <div class="card kpi">
-          <div class="kpi-left">
-            <div class="kpi-title">Service Risk (Units)</div>
-            <div class="kpi-value" id="kpiShortfall">—</div>
-            <div class="kpi-sub">Demand − good output</div>
-          </div>
-          <div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
-        </div>
-
-        <div class="card kpi">
-          <div class="kpi-left">
-            <div class="kpi-title">Capacity Utilization</div>
-            <div class="kpi-value" id="kpiUtil">—</div>
-            <div class="kpi-sub">Scheduled hrs / capacity incl. OT</div>
-          </div>
-          <div class="kpi-icon"><i class="fas fa-stopwatch"></i></div>
-        </div>
-      </div>
-
-      <div style="height:18px"></div>
-
-      <div class="grid-2">
-        <div class="card chart-card">
-          <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
-            <div style="font-weight: 900; color: var(--primary);">Service Risk by Family (Units)</div>
-            <div class="status-pill">
-              <span class="dot" id="statusDot"></span>
-              <span id="statusText">—</span>
-            </div>
-          </div>
-          <div class="chart-wrap"><canvas id="chartServiceRisk"></canvas></div>
-          <div class="small">Demand vs estimated good output (selected week/scenario).</div>
-        </div>
-
-        <div class="card">
-          <div style="font-weight: 900; color: var(--primary); margin-bottom: 10px;">Alerts</div>
-          <ul class="alerts" id="alertsList"></ul>
-          <div class="small">Generated from utilization and shortfall thresholds.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Demand -> MPS -->
-    <section id="demandMps">
-      <div class="section-header">
-        <h2 class="section-title"><i class="fas fa-chart-line"></i> Demand → MPS</h2>
-        <div class="badge">Weekly view</div>
-      </div>
-
-      <div class="grid-2-2">
-        <div class="card chart-card">
-          <div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Demand vs Good Output (Family)</div>
-          <div class="chart-wrap"><canvas id="chartDemandVsGood"></canvas></div>
-          <div class="small">This is your plan-consumption view for the selected week.</div>
-        </div>
-
-        <div class="card">
-          <div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Week Summary</div>
-          <table>
-            <thead>
-              <tr><th>Family</th><th>Demand</th><th>Good</th><th>Shortfall</th></tr>
-            </thead>
-            <tbody id="tblDemandMps"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Capacity -->
-    <section id="capacity">
-      <div class="section-header">
-        <h2 class="section-title"><i class="fas fa-clock"></i> Capacity (RCCP)</h2>
-        <div class="badge">Base 48 + OT band</div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card chart-card">
-          <div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Scheduled Hours vs Capacity</div>
-          <div class="chart-wrap"><canvas id="chartCapacity"></canvas></div>
-          <div class="small">Capacity uses your band rule (0 / +12 / +24 hrs).</div>
-        </div>
-
-        <div class="card">
-          <div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Capacity Table</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Week</th>
-                <th>Scheduled</th>
-                <th>Util (vs base)</th>
-                <th>OT</th>
-                <th>Remaining (hrs)</th>
-              </tr>
-            </thead>
-            <tbody id="tblCapacity"></tbody>
-          </table>
-          <div class="small">Remaining (hrs) = Capacity w/ OT − Scheduled (positive means spare capacity).</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Schedule -->
-    <section id="schedule">
-      <div class="section-header">
-        <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Daily Production Schedule</h2>
-        <div class="badge">From Excel</div>
-      </div>
-
-      <div class="controls-row">
-        <div class="control">
-          <i class="fas fa-filter"></i> Family:
+</div>
+</div>
+<div class="dashboard-nav">
+<a class="nav-item active" href="#overview"><i class="fas fa-tachometer-alt"></i> Overview</a>
+<a class="nav-item" href="#demandMps"><i class="fas fa-chart-line"></i> Demand → MPS</a>
+<a class="nav-item" href="#capacity"><i class="fas fa-clock"></i> Capacity</a>
+<a class="nav-item" href="#schedule"><i class="fas fa-calendar-alt"></i> Schedule</a>
+<a class="nav-item" href="#oee"><i class="fas fa-gauge-high"></i> OEE</a>
+<a class="nav-item" href="#scenarios"><i class="fas fa-random"></i> Scenarios</a>
+<a class="nav-item" href="#downloads"><i class="fas fa-download"></i> Downloads</a>
+</div>
+</header>
+<!-- OVERVIEW -->
+<section id="overview">
+<div class="section-header">
+<h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Control Tower Overview</h2>
+<div class="badge">Live filters</div>
+</div>
+<div class="grid-4">
+<div class="card kpi">
+<div class="kpi-left">
+<div class="kpi-title">Demand (Units)</div>
+<div class="kpi-value" id="kpiDemand">—</div>
+<div class="kpi-sub">Selected week • selected scenario</div>
+</div>
+<div class="kpi-icon"><i class="fas fa-bullseye"></i></div>
+</div>
+<div class="card kpi">
+<div class="kpi-left">
+<div class="kpi-title">Good Output (Est.)</div>
+<div class="kpi-value" id="kpiGood">—</div>
+<div class="kpi-sub">Post-yield estimate</div>
+</div>
+<div class="kpi-icon"><i class="fas fa-box"></i></div>
+</div>
+<div class="card kpi">
+<div class="kpi-left">
+<div class="kpi-title">Service Risk (Units)</div>
+<div class="kpi-value" id="kpiShortfall">—</div>
+<div class="kpi-sub">Demand − good output</div>
+</div>
+<div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
+</div>
+<div class="card kpi">
+<div class="kpi-left">
+<div class="kpi-title">Capacity Utilization</div>
+<div class="kpi-value" id="kpiUtil">—</div>
+<div class="kpi-sub">Scheduled hrs / capacity incl. OT</div>
+</div>
+<div class="kpi-icon"><i class="fas fa-stopwatch"></i></div>
+</div>
+</div>
+<div style="height:18px"></div>
+<div class="grid-2">
+<div class="card chart-card">
+<div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
+<div style="font-weight: 900; color: var(--primary);">Service Risk by Family (Units)</div>
+<div class="status-pill">
+<span class="dot" id="statusDot"></span>
+<span id="statusText">—</span>
+</div>
+</div>
+<div class="chart-wrap"><canvas id="chartServiceRisk"></canvas></div>
+<div class="small">Demand vs estimated good output (selected week/scenario).</div>
+</div>
+<div class="card">
+<div style="font-weight: 900; color: var(--primary); margin-bottom: 10px;">Alerts</div>
+<ul class="alerts" id="alertsList"></ul>
+<div class="small">Generated from utilization and shortfall thresholds.</div>
+</div>
+</div>
+</section>
+<!-- Demand -> MPS -->
+<section id="demandMps">
+<div class="section-header">
+<h2 class="section-title"><i class="fas fa-chart-line"></i> Demand → MPS</h2>
+<div class="badge">Weekly view</div>
+</div>
+<div class="grid-2-2">
+<div class="card chart-card">
+<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Demand vs Good Output (Family)</div>
+<div class="chart-wrap"><canvas id="chartDemandVsGood"></canvas></div>
+<div class="small">This is your plan-consumption view for the selected week.</div>
+</div>
+<div class="card">
+<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Week Summary</div>
+<table>
+<thead>
+<tr><th>Family</th><th>Demand</th><th>Good</th><th>Shortfall</th></tr>
+</thead>
+<tbody id="tblDemandMps"></tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Capacity -->
+<section id="capacity">
+<div class="section-header">
+<h2 class="section-title"><i class="fas fa-clock"></i> Capacity (RCCP)</h2>
+<div class="badge">Base 48 + OT band</div>
+</div>
+<div class="grid-2">
+<div class="card chart-card">
+<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Scheduled Hours vs Capacity</div>
+<div class="chart-wrap"><canvas id="chartCapacity"></canvas></div>
+<div class="small">Capacity uses your band rule (0 / +12 / +24 hrs).</div>
+</div>
+<div class="card">
+<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Capacity Table</div>
+<table>
+<thead>
+<tr>
+<th>Week</th>
+<th>Scheduled</th>
+<th>Util (vs base)</th>
+<th>OT</th>
+<th>Remaining (hrs)</th>
+</tr>
+</thead>
+<tbody id="tblCapacity"></tbody>
+</table>
+<div class="small">Remaining (hrs) = Capacity w/ OT − Scheduled (positive means spare capacity).</div>
+</div>
+</div>
+</section>
+<!-- Schedule -->
+<section id="schedule">
+<div class="section-header">
+<h2 class="section-title"><i class="fas fa-calendar-alt"></i> Daily Production Schedule</h2>
+<div class="badge">From Excel</div>
+</div>
+<div class="controls-row">
+<div class="control">
+<i class="fas fa-filter"></i> Family:
           <select id="familyFilter">
-            <option value="All" selected>All</option>
-            <option value="Yogurt">Yogurt</option>
-            <option value="Bakery">Bakery</option>
-            <option value="Muesli">Muesli</option>
-            <option value="Oil">Oil</option>
-          </select>
-        </div>
-        <div class="small" id="scheduleStatus">Loading schedule from ./data/Production_Daily_Schedule.xlsx ...</div>
-      </div>
-
-      <div class="info-box error" id="scheduleError"></div>
-
-      <table>
-        <thead>
-          <tr><th>Day</th><th>Family</th><th>SKU</th><th>Units</th><th>Prod hrs</th><th>Chg hrs</th></tr>
-        </thead>
-        <tbody id="tblSchedule"></tbody>
-      </table>
-    </section>
-
-    <!-- OEE -->
-    <section id="oee">
-      <div class="section-header">
-        <h2 class="section-title"><i class="fas fa-gauge-high"></i> OEE & Waste</h2>
-        <div class="badge">By family</div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card chart-card">
-          <div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">OEE Components</div>
-          <div class="chart-wrap"><canvas id="chartOee"></canvas></div>
-          <div class="small">Availability / Performance / Quality / OEE for the selected week.</div>
-        </div>
-
-        <div class="card">
-          <div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">OEE Assumptions</div>
-          <table>
-            <thead><tr><th>Family</th><th>Planned DT%</th><th>Speed loss%</th><th>Yield%</th></tr></thead>
-            <tbody id="tblAssumptions"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Scenarios -->
-    <section id="scenarios">
-      <div class="section-header">
-        <h2 class="section-title"><i class="fas fa-random"></i> Scenario Planner</h2>
-        <div class="badge">Base vs Selected</div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card chart-card">
-          <div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Shortfall Comparison</div>
-          <div class="chart-wrap"><canvas id="chartScenarioCompare"></canvas></div>
-          <div class="small">Compare shortfall (units) by family vs Base.</div>
-        </div>
-
-        <div class="card">
-          <div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Scenario Table</div>
-          <table>
-            <thead><tr><th>Family</th><th>Demand</th><th>Good</th><th>Shortfall</th></tr></thead>
-            <tbody id="tblScenario"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <!-- Downloads -->
-    <section id="downloads">
-      <div class="section-header">
-        <h2 class="section-title"><i class="fas fa-download"></i> Downloads & Assumptions</h2>
-        <div class="badge">Project artifacts</div>
-      </div>
-
-      <div class="small">
+<option selected="" value="All">All</option>
+<option value="Yogurt">Yogurt</option>
+<option value="Bakery">Bakery</option>
+<option value="Muesli">Muesli</option>
+<option value="Oil">Oil</option>
+</select>
+</div>
+<div class="small" id="scheduleStatus">Loading schedule from ./data/Production_Daily_Schedule.xlsx ...</div>
+</div>
+<div class="info-box error" id="scheduleError"></div>
+<table>
+<thead>
+<tr><th>Day</th><th>Family</th><th>SKU</th><th>Units</th><th>Prod hrs</th><th>Chg hrs</th></tr>
+</thead>
+<tbody id="tblSchedule"></tbody>
+</table>
+</section>
+<!-- OEE -->
+<section id="oee">
+<div class="section-header">
+<h2 class="section-title"><i class="fas fa-gauge-high"></i> OEE &amp; Waste</h2>
+<div class="badge">By family</div>
+</div>
+<div class="grid-2">
+<div class="card chart-card">
+<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">OEE Components</div>
+<div class="chart-wrap"><canvas id="chartOee"></canvas></div>
+<div class="small">Availability / Performance / Quality / OEE for the selected week.</div>
+</div>
+<div class="card">
+<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">OEE Assumptions</div>
+<table>
+<thead><tr><th>Family</th><th>Planned DT%</th><th>Speed loss%</th><th>Yield%</th></tr></thead>
+<tbody id="tblAssumptions"></tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Scenarios -->
+<section id="scenarios">
+<div class="section-header">
+<h2 class="section-title"><i class="fas fa-random"></i> Scenario Planner</h2>
+<div class="badge">Base vs Selected</div>
+</div>
+<div class="grid-2">
+<div class="card chart-card">
+<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Shortfall Comparison</div>
+<div class="chart-wrap"><canvas id="chartScenarioCompare"></canvas></div>
+<div class="small">Compare shortfall (units) by family vs Base.</div>
+</div>
+<div class="card">
+<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Scenario Table</div>
+<table>
+<thead><tr><th>Family</th><th>Demand</th><th>Good</th><th>Shortfall</th></tr></thead>
+<tbody id="tblScenario"></tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- Downloads -->
+<section id="downloads">
+<div class="section-header">
+<h2 class="section-title"><i class="fas fa-download"></i> Downloads &amp; Assumptions</h2>
+<div class="badge">Project artifacts</div>
+</div>
+<div class="small">
         Download the generated Excel outputs and the assumptions document used for this simulation.
       </div>
-
-      <div style="margin-top: 12px; display:flex; flex-wrap: wrap; gap: 10px;">
-        <a class="download-link" href="./data/Weekly_Forecast_Plant_Level.xlsx" download>
-          <i class="fas fa-file-excel"></i> Weekly Forecast (Plant)
+<div style="margin-top: 12px; display:flex; flex-wrap: wrap; gap: 10px;">
+<a class="download-link" download="" href="./data/Weekly_Forecast_Plant_Level.xlsx">
+<i class="fas fa-file-excel"></i> Weekly Forecast (Plant)
         </a>
-
-        <a class="download-link" href="./data/Master_Production_Schedule.xlsx" download>
-          <i class="fas fa-file-excel"></i> Master Production Schedule
+<a class="download-link" download="" href="./data/Master_Production_Schedule.xlsx">
+<i class="fas fa-file-excel"></i> Master Production Schedule
         </a>
-
-        <a class="download-link" href="./data/Production_Daily_Schedule.xlsx" download>
-          <i class="fas fa-file-excel"></i> Daily Production Schedule
+<a class="download-link" download="" href="./data/Production_Daily_Schedule.xlsx">
+<i class="fas fa-file-excel"></i> Daily Production Schedule
         </a>
-
-        <a class="download-link" href="./data/Plant-Assumptions.docx" download>
-          <i class="fas fa-file-word"></i> Plant Assumptions
+<a class="download-link" download="" href="./data/Plant-Assumptions.docx">
+<i class="fas fa-file-word"></i> Plant Assumptions
         </a>
-
-        <a class="download-link" href="./data/PLAN.docx" download>
-          <i class="fas fa-file-word"></i> Ops Plan Notes
+<a class="download-link" download="" href="./data/PLAN.docx">
+<i class="fas fa-file-word"></i> Ops Plan Notes
         </a>
-      </div>
-    </section>
-
-    <footer>
+</div>
+</section>
+<footer>
       SavoryRoots Provisions • Operations Module • Control Tower Dashboard
     </footer>
-  </div>
-
-  <script>
+</div>
+<script>
     /* ---------- DATA ---------- */
     const FAMILIES = ["Yogurt","Bakery","Muesli","Oil"];
 
