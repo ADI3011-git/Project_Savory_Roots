@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>SavoryRoots - Operations Control Tower</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<!-- SheetJS (XLSX reader) -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<style>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>SavoryRoots - Operations Control Tower</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
     :root{
       --primary:#2c5530;
       --secondary:#739e82;
@@ -23,730 +22,764 @@
       --warning:#ffc107;
       --success:#28a745;
     }
-    *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
-    body{background-color:#f5f7f8;color:var(--dark);line-height:1.6;}
-    .container{max-width:1400px;margin:0 auto;padding:20px;}
-
-    header{
-      background:linear-gradient(135deg,var(--primary) 0%,var(--secondary) 100%);
-      color:#fff;padding:25px 30px;border-radius:12px 12px 0 0;margin-bottom:25px;
-      box-shadow:0 4px 12px rgba(0,0,0,0.1);
-    }
-    .header-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;}
-    .logo{display:flex;align-items:center;gap:15px;}
-    .logo i{font-size:2.5rem;color:var(--accent);}
-    .logo h1{font-size:2.2rem;font-weight:700;letter-spacing:0.5px;}
-    .logo span{color:var(--accent);}
-    .subtitle{font-size:1.05rem;opacity:0.9;margin-top:5px;}
-
-    .header-actions{display:flex;gap:12px;flex-wrap:wrap;}
-    .pill{
-      background:rgba(255,255,255,0.15);
-      border:1px solid rgba(255,255,255,0.25);
-      color:white;padding:10px 14px;border-radius:999px;display:flex;align-items:center;gap:8px;
-      font-weight:700;font-size:0.95rem;user-select:none;
-    }
-    .pill select{background:rgba(255,255,255,0.15);color:white;border:none;outline:none;font-weight:800;cursor:pointer;}
-    .pill select option{color:var(--dark);}
-    .pill.clickable{cursor:pointer;}
-
-    .dashboard-nav{
-      display:flex;background:white;border-radius:8px;overflow:hidden;margin:20px 0 10px;
-      box-shadow:0 2px 8px rgba(0,0,0,0.08);
-    }
-    .nav-item{
-      flex:1;text-align:center;padding:15px 10px;color:var(--dark);text-decoration:none;
-      font-weight:700;font-size:0.95rem;transition:all 0.3s ease;border-right:1px solid var(--border);
-    }
-    .nav-item:last-child{border-right:none;}
-    .nav-item:hover,.nav-item.active{background-color:var(--primary);color:white;}
-    .nav-item i{margin-right:8px;font-size:1.1rem;}
-
-    section{
-      background:#fff;border-radius:10px;padding:25px;margin-bottom:30px;
-      box-shadow:0 3px 10px rgba(0,0,0,0.06);border:1px solid var(--border);
-    }
-    .section-header{
-      display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px;
-      padding-bottom:15px;border-bottom:2px solid var(--light-green);flex-wrap:wrap;
-    }
-    .section-title{
-      font-size:1.5rem;font-weight:800;color:var(--primary);
-      display:flex;align-items:center;gap:10px;
-    }
-    .section-title i{color:var(--secondary);}
-    .badge{
-      background:var(--accent);color:#fff;padding:3px 12px;border-radius:20px;
-      font-size:0.85rem;font-weight:800;white-space:nowrap;
-    }
-
-    .grid-2{display:grid;grid-template-columns:1.2fr 0.8fr;gap:20px;}
-    .grid-2-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
-
-    .card{
-      border:1px solid var(--border);border-radius:10px;padding:16px;background:#fff;
-      box-shadow:0 2px 8px rgba(0,0,0,0.05);min-height:110px;
-    }
-
-    .kpi{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;}
-    .kpi .kpi-left .kpi-title{color:var(--gray);font-weight:800;font-size:0.9rem;margin-bottom:6px;}
-    .kpi .kpi-left .kpi-value{font-size:1.8rem;font-weight:900;color:var(--dark);}
-    .kpi .kpi-left .kpi-sub{margin-top:6px;font-size:0.9rem;color:var(--gray);}
-    .kpi .kpi-icon{
-      width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-      background:var(--light-green);color:var(--primary);font-size:1.2rem;flex:0 0 auto;
-    }
-
-    .status-pill{
-      display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;
-      font-weight:900;font-size:0.85rem;border:1px solid var(--border);background:#fff;
-    }
-    .dot{width:10px;height:10px;border-radius:50%;background:var(--gray);}
-    .small{font-size:0.92rem;color:var(--gray);}
-
-    .chart-card{height:340px;}
-    .chart-wrap{height:280px;}
-
-    .alerts{list-style:none;margin-top:8px;padding-left:0;}
-    .alerts li{
-      padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;
-      display:flex;gap:10px;align-items:flex-start;background:#fff;
-    }
-    .alerts i{margin-top:2px;}
-
-    table{width:100%;border-collapse:collapse;margin-top:10px;}
-    th{
-      background:var(--light-green);color:var(--primary);font-weight:900;text-align:left;
-      padding:12px;border-bottom:2px solid var(--secondary);
-    }
-    td{padding:12px;border-bottom:1px solid var(--border);}
-    tr:hover{background:#f9f9f9;}
-
-    .controls-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
-    .control{
-      display:flex;align-items:center;gap:10px;background:var(--light-green);
-      border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-weight:900;color:var(--primary);
-    }
-    .control select{
-      border:1px solid var(--border);border-radius:8px;padding:6px 10px;
-      font-weight:800;outline:none;background:#fff;color:var(--dark);cursor:pointer;
-    }
-
-    .download-link{
-      display:inline-flex;align-items:center;gap:10px;background:var(--primary);color:#fff;
-      padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:800;
-      transition:all 0.2s ease;box-shadow:0 2px 5px rgba(0,0,0,0.1);
-    }
-    .download-link:hover{background:var(--secondary);transform:translateY(-1px);}
-
-    .info-box{
-      border:1px solid var(--border);
-      background:#fff;
-      border-radius:10px;
-      padding:12px 14px;
-      margin-top:10px;
-      color:var(--gray);
-      font-size:0.95rem;
-    }
-    .info-box.error{
-      border-color:rgba(220,53,69,0.35);
-      background:rgba(220,53,69,0.06);
-      color:#8a1f2b;
-      display:none;
-    }
-
-    footer{
-      text-align:center;padding:20px;color:var(--gray);font-size:0.9rem;margin-top:30px;
-      border-top:1px solid var(--border);
-    }
-
+    *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Tahoma,Geneva,Verdana,sans-serif}
+    body{background-color:#f5f7f8;color:var(--dark);line-height:1.6}
+    .container{max-width:1400px;margin:0 auto;padding:20px}
+    header{background:linear-gradient(135deg,var(--primary) 0,var(--secondary) 100%);color:#fff;padding:25px 30px;border-radius:12px 12px 0 0;margin-bottom:25px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+    .header-content{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+    .logo{display:flex;align-items:center;gap:15px}
+    .logo i{font-size:2.5rem;color:var(--accent)}
+    .logo h1{font-size:2.2rem;font-weight:700;letter-spacing:0.5px}
+    .logo span{color:var(--accent)}
+    .subtitle{font-size:1.05rem;opacity:0.9;margin-top:5px}
+    .header-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .pill{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);color:white;padding:10px 14px;border-radius:999px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:0.95rem;user-select:none}
+    .pill select{background:rgba(255,255,255,0.15);color:white;border:none;outline:none;font-weight:800;cursor:pointer}
+    .pill select option{color:var(--dark)}
+    .pill.clickable{cursor:pointer}
+    .dashboard-nav{display:flex;background:white;border-radius:8px;overflow:hidden;margin:20px 0 10px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+    .nav-item{flex:1;text-align:center;padding:15px 10px;color:var(--dark);text-decoration:none;font-weight:700;font-size:0.95rem;transition:all 0.3s ease;border-right:1px solid var(--border)}
+    .nav-item:last-child{border-right:none}
+    .nav-item:hover,.nav-item.active{background-color:var(--primary);color:white}
+    .nav-item i{margin-right:8px;font-size:1.1rem}
+    section{background:#fff;border-radius:10px;padding:25px;margin-bottom:30px;box-shadow:0 3px 10px rgba(0,0,0,0.06);border:1px solid var(--border)}
+    .section-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:15px;border-bottom:2px solid var(--light-green);flex-wrap:wrap}
+    .section-title{font-size:1.5rem;font-weight:800;color:var(--primary);display:flex;align-items:center;gap:10px}
+    .section-title i{color:var(--secondary)}
+    .badge{background:var(--accent);color:#fff;padding:3px 12px;border-radius:20px;font-size:0.85rem;font-weight:800;white-space:nowrap}
+    .grid-2{display:grid;grid-template-columns:1.2fr 0.8fr;gap:20px}
+    .grid-2-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .card{border:1px solid var(--border);border-radius:10px;padding:16px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.05);min-height:110px}
+    .kpi{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+    .kpi .kpi-left .kpi-title{color:var(--gray);font-weight:800;font-size:0.9rem;margin-bottom:6px}
+    .kpi .kpi-left .kpi-value{font-size:1.8rem;font-weight:900;color:var(--dark)}
+    .kpi .kpi-left .kpi-sub{margin-top:6px;font-size:0.9rem;color:var(--gray)}
+    .kpi .kpi-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--light-green);color:var(--primary);font-size:1.2rem;flex:0 0 auto}
+    .status-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;font-weight:900;font-size:0.85rem;border:1px solid var(--border);background:#fff}
+    .dot{width:10px;height:10px;border-radius:50%;background:var(--gray)}
+    .small{font-size:0.92rem;color:var(--gray)}
+    .chart-card{height:340px}
+    .chart-wrap{height:280px}
+    .alerts{list-style:none;margin-top:8px;padding-left:0}
+    .alerts li{padding:10px 12px;border:1px solid var(--border);border-radius:10px;margin-bottom:10px;display:flex;gap:10px;align-items:flex-start;background:#fff}
+    .alerts i{margin-top:2px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th{background:var(--light-green);color:var(--primary);font-weight:900;text-align:left;padding:12px;border-bottom:2px solid var(--secondary)}
+    td{padding:12px;border-bottom:1px solid var(--border)}
+    tr:hover{background:#f9f9f9}
+    .controls-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .control{display:flex;align-items:center;gap:10px;background:var(--light-green);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-weight:900;color:var(--primary)}
+    .control select{border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-weight:800;outline:none;background:#fff;color:var(--dark);cursor:pointer}
+    .download-link{display:inline-flex;align-items:center;gap:10px;background:var(--primary);color:#fff;padding:12px 18px;border-radius:10px;text-decoration:none;font-weight:800;transition:all 0.2s ease;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+    .download-link:hover{background:var(--secondary);transform:translateY(-1px)}
+    .info-box{border:1px solid var(--border);background:#fff;border-radius:10px;padding:12px 14px;margin-top:10px;color:var(--gray);font-size:0.95rem}
+    .info-box.error{border-color:rgba(220,53,69,0.35);background:rgba(220,53,69,0.06);color:#8a1f2b;display:none}
+    footer{text-align:center;padding:20px;color:var(--gray);font-size:0.9rem;margin-top:30px;border-top:1px solid var(--border)}
     @media (max-width:1200px){
-      .grid-2{grid-template-columns:1fr;}
-      .grid-2-2{grid-template-columns:1fr;}
-      .grid-4{grid-template-columns:1fr 1fr;}
+      .grid-2{grid-template-columns:1fr}
+      .grid-2-2{grid-template-columns:1fr}
+      .grid-4{grid-template-columns:1fr 1fr}
     }
     @media (max-width:768px){
-      .dashboard-nav{flex-direction:column;}
-      .grid-4{grid-template-columns:1fr;}
-      .chart-card{height:360px;}
-      .chart-wrap{height:300px;}
+      .dashboard-nav{flex-direction:column}
+      .grid-4{grid-template-columns:1fr}
+      .chart-card{height:360px}
+      .chart-wrap{height:300px}
     }
-  
 
-/* --- Global cross-dashboard navigation --- */
-.global-nav{position:sticky;top:0;z-index:200;background:#ffffff;border-bottom:1px solid rgba(0,0,0,.08)}
-.global-nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px}
-.global-nav .brand{font-weight:900;color:#2c5530;text-decoration:none;letter-spacing:.2px}
-.global-links{display:flex;flex-wrap:wrap;gap:10px}
-.g-link{padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:700;color:#2c5530;background:#f1f8e9;border:1px solid rgba(44,85,48,.12)}
-.g-link:hover{background:#e8f5e8}
-.g-link.active{background:#2c5530;color:#fff;border-color:#2c5530}
-@media (max-width:900px){.global-nav-inner{flex-direction:column;align-items:flex-start}.global-links{width:100%}}
-</style>
+    /* --- Global cross-dashboard navigation --- */
+    .global-nav{position:sticky;top:0;z-index:200;background:#ffffff;border-bottom:1px solid rgba(0,0,0,.08)}
+    .global-nav-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 16px}
+    .global-nav .brand{font-weight:900;color:#2c5530;text-decoration:none;letter-spacing:.2px}
+    .global-links{display:flex;flex-wrap:wrap;gap:10px}
+    .g-link{padding:8px 10px;border-radius:8px;text-decoration:none;font-weight:700;color:#2c5530;background:#f1f8e9;border:1px solid rgba(44,85,48,.12)}
+    .g-link:hover{background:#e8f5e8}
+    .g-link.active{background:#2c5530;color:#fff;border-color:#2c5530}
+    @media (max-width:900px){
+      .global-nav-inner{flex-direction:column;align-items:flex-start}
+      .global-links{width:100%}
+    }
+  </style>
 </head>
-<body>
-<nav class="global-nav">
-<div class="global-nav-inner">
-<a class="brand" href="https://adi3011-git.github.io/Project_Savory_Roots/">SavoryRoots</a>
-<div class="global-links">
-<a class="g-link" href="https://adi3011-git.github.io/Project_Savory_Roots/">Main</a>
-<a class="g-link" href="https://adi3011-git.github.io/Project_Savory_Roots/sourcing/index.html">Sourcing</a>
-<a class="g-link" href="https://adi3011-git.github.io/Project_Savory_Roots/forecasting/index.html">Forecasting</a>
-<a class="g-link active" href="https://adi3011-git.github.io/Project_Savory_Roots/operations/index.html">Operations</a>
-<a class="g-link" href="https://adi3011-git.github.io/Project_Savory_Roots/inventory/index.html">Inventory &amp; Warehousing</a>
-<a class="g-link" href="https://adi3011-git.github.io/Project_Savory_Roots/distribution/index.html">Distribution</a>
-</div>
-</div>
-</nav>
 
-<div class="container">
-<header>
-<div class="header-content">
-<div class="logo">
-<i class="fas fa-industry"></i>
-<div>
-<h1>Savory<span>Roots</span></h1>
-<div class="subtitle">Operations Control Tower | MPS • RCCP • Schedule • OEE • Scenarios</div>
-</div>
-</div>
-<div class="header-actions">
-<div class="pill">
-<i class="fas fa-calendar-week"></i>
-            Week:
-            <select id="weekSelectTop">
-<option selected="" value="1">Week 1</option>
-<option value="2">Week 2</option>
-<option value="3">Week 3</option>
-<option value="4">Week 4</option>
-<option value="5">Week 5</option>
-</select>
-</div>
-<div class="pill">
-<i class="fas fa-flask"></i>
-            Scenario:
-            <select id="scenarioSelectTop">
-<option selected="" value="S0_Base">S0 Base</option>
-<option value="S1_DemandPlus20">S1 Demand +20%</option>
-<option value="S2_NoOvertime">S2 No Overtime</option>
-<option value="S3_YogurtYieldDrop">S3 Yogurt Yield Drop</option>
-</select>
-</div>
-<div class="pill clickable" onclick="window.location.href='../index.html'">
-<i class="fas fa-home"></i> Main Dashboard
+<body>
+  <nav class="global-nav">
+    <div class="global-nav-inner">
+      <a class="brand" href="https://adi3011-git.github.io/Project_Savory_Roots/">SavoryRoots</a>
+      <div class="global-links">
+        <a class="g-link active" href="https://adi3011-git.github.io/Project_Savory_Roots/">Main</a>
+        <a class="g-link active" href="https://adi3011-git.github.io/Project_Savory_Roots/sourcing/index.html">Sourcing</a>
+        <a class="g-link active" href="https://adi3011-git.github.io/Project_Savory_Roots/forecasting/index.html">Forecasting</a>
+        <a class="g-link active" href="https://adi3011-git.github.io/Project_Savory_Roots/operations/index.html">Operations</a>
+        <a class="g-link active" href="https://adi3011-git.github.io/Project_Savory_Roots/inventory/index.html">Inventory &amp; Warehousing</a>
+        <a class="g-link active" href="https://adi3011-git.github.io/Project_Savory_Roots/distribution/index.html">Distribution</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-industry"></i>
+          <div>
+            <h1>Savory<span>Roots</span></h1>
+            <div class="subtitle">Operations Control Tower • MPS • RCCP • Schedule • OEE • Scenarios</div>
           </div>
-</div>
-</div>
-<div class="dashboard-nav">
-<a class="nav-item active" href="#overview"><i class="fas fa-tachometer-alt"></i> Overview</a>
-<a class="nav-item" href="#demandMps"><i class="fas fa-chart-line"></i> Demand → MPS</a>
-<a class="nav-item" href="#capacity"><i class="fas fa-clock"></i> Capacity</a>
-<a class="nav-item" href="#schedule"><i class="fas fa-calendar-alt"></i> Schedule</a>
-<a class="nav-item" href="#oee"><i class="fas fa-gauge-high"></i> OEE</a>
-<a class="nav-item" href="#scenarios"><i class="fas fa-random"></i> Scenarios</a>
-<a class="nav-item" href="#downloads"><i class="fas fa-download"></i> Downloads</a>
-</div>
-</header>
-<!-- OVERVIEW -->
-<section id="overview">
-<div class="section-header">
-<h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Control Tower Overview</h2>
-<div class="badge">Live filters</div>
-</div>
-<div class="grid-4">
-<div class="card kpi">
-<div class="kpi-left">
-<div class="kpi-title">Demand (Units)</div>
-<div class="kpi-value" id="kpiDemand">—</div>
-<div class="kpi-sub">Selected week • selected scenario</div>
-</div>
-<div class="kpi-icon"><i class="fas fa-bullseye"></i></div>
-</div>
-<div class="card kpi">
-<div class="kpi-left">
-<div class="kpi-title">Good Output (Est.)</div>
-<div class="kpi-value" id="kpiGood">—</div>
-<div class="kpi-sub">Post-yield estimate</div>
-</div>
-<div class="kpi-icon"><i class="fas fa-box"></i></div>
-</div>
-<div class="card kpi">
-<div class="kpi-left">
-<div class="kpi-title">Service Risk (Units)</div>
-<div class="kpi-value" id="kpiShortfall">—</div>
-<div class="kpi-sub">Demand − good output</div>
-</div>
-<div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
-</div>
-<div class="card kpi">
-<div class="kpi-left">
-<div class="kpi-title">Capacity Utilization</div>
-<div class="kpi-value" id="kpiUtil">—</div>
-<div class="kpi-sub">Scheduled hrs / capacity incl. OT</div>
-</div>
-<div class="kpi-icon"><i class="fas fa-stopwatch"></i></div>
-</div>
-</div>
-<div style="height:18px"></div>
-<div class="grid-2">
-<div class="card chart-card">
-<div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
-<div style="font-weight: 900; color: var(--primary);">Service Risk by Family (Units)</div>
-<div class="status-pill">
-<span class="dot" id="statusDot"></span>
-<span id="statusText">—</span>
-</div>
-</div>
-<div class="chart-wrap"><canvas id="chartServiceRisk"></canvas></div>
-<div class="small">Demand vs estimated good output (selected week/scenario).</div>
-</div>
-<div class="card">
-<div style="font-weight: 900; color: var(--primary); margin-bottom: 10px;">Alerts</div>
-<ul class="alerts" id="alertsList"></ul>
-<div class="small">Generated from utilization and shortfall thresholds.</div>
-</div>
-</div>
-</section>
-<!-- Demand -> MPS -->
-<section id="demandMps">
-<div class="section-header">
-<h2 class="section-title"><i class="fas fa-chart-line"></i> Demand → MPS</h2>
-<div class="badge">Weekly view</div>
-</div>
-<div class="grid-2-2">
-<div class="card chart-card">
-<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Demand vs Good Output (Family)</div>
-<div class="chart-wrap"><canvas id="chartDemandVsGood"></canvas></div>
-<div class="small">This is your plan-consumption view for the selected week.</div>
-</div>
-<div class="card">
-<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Week Summary</div>
-<table>
-<thead>
-<tr><th>Family</th><th>Demand</th><th>Good</th><th>Shortfall</th></tr>
-</thead>
-<tbody id="tblDemandMps"></tbody>
-</table>
-</div>
-</div>
-</section>
-<!-- Capacity -->
-<section id="capacity">
-<div class="section-header">
-<h2 class="section-title"><i class="fas fa-clock"></i> Capacity (RCCP)</h2>
-<div class="badge">Base 48 + OT band</div>
-</div>
-<div class="grid-2">
-<div class="card chart-card">
-<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Scheduled Hours vs Capacity</div>
-<div class="chart-wrap"><canvas id="chartCapacity"></canvas></div>
-<div class="small">Capacity uses your band rule (0 / +12 / +24 hrs).</div>
-</div>
-<div class="card">
-<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Capacity Table</div>
-<table>
-<thead>
-<tr>
-<th>Week</th>
-<th>Scheduled</th>
-<th>Util (vs base)</th>
-<th>OT</th>
-<th>Remaining (hrs)</th>
-</tr>
-</thead>
-<tbody id="tblCapacity"></tbody>
-</table>
-<div class="small">Remaining (hrs) = Capacity w/ OT − Scheduled (positive means spare capacity).</div>
-</div>
-</div>
-</section>
-<!-- Schedule -->
-<section id="schedule">
-<div class="section-header">
-<h2 class="section-title"><i class="fas fa-calendar-alt"></i> Daily Production Schedule</h2>
-<div class="badge">From Excel</div>
-</div>
-<div class="controls-row">
-<div class="control">
-<i class="fas fa-filter"></i> Family:
+        </div>
+
+        <div class="header-actions">
+          <div class="pill">
+            <i class="fas fa-calendar-week"></i>
+            Week
+            <select id="weekSelectTop">
+              <option value="1" selected>Week 1</option>
+              <option value="2">Week 2</option>
+              <option value="3">Week 3</option>
+              <option value="4">Week 4</option>
+              <option value="5">Week 5</option>
+            </select>
+          </div>
+
+          <div class="pill">
+            <i class="fas fa-flask"></i>
+            Scenario
+            <select id="scenarioSelectTop">
+              <option value="S0Base" selected>S0 Base</option>
+              <option value="S1DemandPlus20">S1 Demand +20%</option>
+              <option value="S2NoOvertime">S2 No Overtime</option>
+              <option value="S3YogurtYieldDrop">S3 Yogurt Yield Drop</option>
+            </select>
+          </div>
+
+          <div class="pill clickable" onclick="window.location.href='./index.html'">
+            <i class="fas fa-home"></i> Main Dashboard
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-nav">
+        <a class="nav-item active" href="#overview"><i class="fas fa-tachometer-alt"></i> Overview</a>
+        <a class="nav-item" href="#demandMps"><i class="fas fa-chart-line"></i> Demand / MPS</a>
+        <a class="nav-item" href="#capacity"><i class="fas fa-clock"></i> Capacity</a>
+        <a class="nav-item" href="#schedule"><i class="fas fa-calendar-alt"></i> Schedule</a>
+        <a class="nav-item" href="#oee"><i class="fas fa-gauge-high"></i> OEE</a>
+        <a class="nav-item" href="#scenarios"><i class="fas fa-random"></i> Scenarios</a>
+        <a class="nav-item" href="#downloads"><i class="fas fa-download"></i> Downloads</a>
+      </div>
+    </header>
+
+    <!-- OVERVIEW -->
+    <section id="overview">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> Control Tower Overview</h2>
+        <div class="badge">Live filters</div>
+      </div>
+
+      <div class="grid-4">
+        <div class="card kpi">
+          <div class="kpi-left">
+            <div class="kpi-title">Demand (Units)</div>
+            <div class="kpi-value" id="kpiDemand"></div>
+            <div class="kpi-sub">Selected week • selected scenario</div>
+          </div>
+          <div class="kpi-icon"><i class="fas fa-bullseye"></i></div>
+        </div>
+
+        <div class="card kpi">
+          <div class="kpi-left">
+            <div class="kpi-title">Good Output (Est.)</div>
+            <div class="kpi-value" id="kpiGood"></div>
+            <div class="kpi-sub">Post-yield estimate</div>
+          </div>
+          <div class="kpi-icon"><i class="fas fa-box"></i></div>
+        </div>
+
+        <div class="card kpi">
+          <div class="kpi-left">
+            <div class="kpi-title">Service Risk (Units)</div>
+            <div class="kpi-value" id="kpiShortfall"></div>
+            <div class="kpi-sub">Demand − good output</div>
+          </div>
+          <div class="kpi-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        </div>
+
+        <div class="card kpi">
+          <div class="kpi-left">
+            <div class="kpi-title">Capacity Utilization</div>
+            <div class="kpi-value" id="kpiUtil"></div>
+            <div class="kpi-sub">Scheduled hrs / capacity incl. OT</div>
+          </div>
+          <div class="kpi-icon"><i class="fas fa-stopwatch"></i></div>
+        </div>
+      </div>
+
+      <div style="height:18px"></div>
+
+      <div class="grid-2">
+        <div class="card chart-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:10px">
+            <div style="font-weight:900;color:var(--primary)">Service Risk by Family (Units)</div>
+            <div class="status-pill">
+              <span class="dot" id="statusDot"></span>
+              <span id="statusText"></span>
+            </div>
+          </div>
+          <div class="chart-wrap"><canvas id="chartServiceRisk"></canvas></div>
+          <div class="small">Demand vs estimated good output (selected week/scenario).</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:900;color:var(--primary);margin-bottom:10px">Alerts</div>
+          <ul class="alerts" id="alertsList"></ul>
+          <div class="small">Generated from utilization and shortfall thresholds.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demand / MPS -->
+    <section id="demandMps">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-chart-line"></i> Demand → MPS</h2>
+        <div class="badge">Weekly view</div>
+      </div>
+
+      <div class="grid-2-2">
+        <div class="card chart-card">
+          <div style="font-weight:900;color:var(--primary);margin-bottom:8px">Demand vs Good Output (Family)</div>
+          <div class="chart-wrap"><canvas id="chartDemandVsGood"></canvas></div>
+          <div class="small">This is your plan-consumption view for the selected week.</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:900;color:var(--primary);margin-bottom:8px">Week Summary</div>
+          <table>
+            <thead>
+              <tr><th>Family</th><th>Demand</th><th>Good</th><th>Shortfall</th></tr>
+            </thead>
+            <tbody id="tblDemandMps"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Capacity -->
+    <section id="capacity">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-clock"></i> Capacity (RCCP)</h2>
+        <div class="badge">Base 48 + OT band</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card chart-card">
+          <div style="font-weight:900;color:var(--primary);margin-bottom:8px">Scheduled Hours vs Capacity</div>
+          <div class="chart-wrap"><canvas id="chartCapacity"></canvas></div>
+          <div class="small">Capacity uses your band rule (0 / +12 / +24 hrs).</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:900;color:var(--primary);margin-bottom:8px">Capacity Table</div>
+          <table>
+            <thead>
+              <tr><th>Week</th><th>Scheduled</th><th>Util (vs base)</th><th>OT</th><th>Remaining (hrs)</th></tr>
+            </thead>
+            <tbody id="tblCapacity"></tbody>
+          </table>
+          <div class="small">Remaining (hrs) = Capacity w/ OT − Scheduled (positive means spare capacity).</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Schedule -->
+    <section id="schedule">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Daily Production Schedule</h2>
+        <div class="badge">Embedded (from Excel)</div>
+      </div>
+
+      <div class="controls-row">
+        <div class="control">
+          <i class="fas fa-filter"></i>
+          Family
           <select id="familyFilter">
-<option selected="" value="All">All</option>
-<option value="Yogurt">Yogurt</option>
-<option value="Bakery">Bakery</option>
-<option value="Muesli">Muesli</option>
-<option value="Oil">Oil</option>
-</select>
-</div>
-<div class="small" id="scheduleStatus">Loading schedule from ./data/Production_Daily_Schedule.xlsx ...</div>
-</div>
-<div class="info-box error" id="scheduleError"></div>
-<table>
-<thead>
-<tr><th>Day</th><th>Family</th><th>SKU</th><th>Units</th><th>Prod hrs</th><th>Chg hrs</th></tr>
-</thead>
-<tbody id="tblSchedule"></tbody>
-</table>
-</section>
-<!-- OEE -->
-<section id="oee">
-<div class="section-header">
-<h2 class="section-title"><i class="fas fa-gauge-high"></i> OEE &amp; Waste</h2>
-<div class="badge">By family</div>
-</div>
-<div class="grid-2">
-<div class="card chart-card">
-<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">OEE Components</div>
-<div class="chart-wrap"><canvas id="chartOee"></canvas></div>
-<div class="small">Availability / Performance / Quality / OEE for the selected week.</div>
-</div>
-<div class="card">
-<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">OEE Assumptions</div>
-<table>
-<thead><tr><th>Family</th><th>Planned DT%</th><th>Speed loss%</th><th>Yield%</th></tr></thead>
-<tbody id="tblAssumptions"></tbody>
-</table>
-</div>
-</div>
-</section>
-<!-- Scenarios -->
-<section id="scenarios">
-<div class="section-header">
-<h2 class="section-title"><i class="fas fa-random"></i> Scenario Planner</h2>
-<div class="badge">Base vs Selected</div>
-</div>
-<div class="grid-2">
-<div class="card chart-card">
-<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Shortfall Comparison</div>
-<div class="chart-wrap"><canvas id="chartScenarioCompare"></canvas></div>
-<div class="small">Compare shortfall (units) by family vs Base.</div>
-</div>
-<div class="card">
-<div style="font-weight: 900; color: var(--primary); margin-bottom: 8px;">Scenario Table</div>
-<table>
-<thead><tr><th>Family</th><th>Demand</th><th>Good</th><th>Shortfall</th></tr></thead>
-<tbody id="tblScenario"></tbody>
-</table>
-</div>
-</div>
-</section>
-<!-- Downloads -->
-<section id="downloads">
-<div class="section-header">
-<h2 class="section-title"><i class="fas fa-download"></i> Downloads &amp; Assumptions</h2>
-<div class="badge">Project artifacts</div>
-</div>
-<div class="small">
+            <option value="All" selected>All</option>
+            <option value="Yogurt">Yogurt</option>
+            <option value="Bakery">Bakery</option>
+            <option value="Muesli">Muesli</option>
+            <option value="Oil">Oil</option>
+          </select>
+        </div>
+        <div class="small" id="scheduleStatus">Loading embedded schedule…</div>
+      </div>
+
+      <div class="info-box error" id="scheduleError"></div>
+
+      <table>
+        <thead>
+          <tr><th>Day</th><th>Family</th><th>SKU</th><th>Units</th><th>Prod hrs</th><th>Chg hrs</th></tr>
+        </thead>
+        <tbody id="tblSchedule"></tbody>
+      </table>
+    </section>
+
+    <!-- OEE -->
+    <section id="oee">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-gauge-high"></i> OEE &amp; Waste</h2>
+        <div class="badge">By family</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card chart-card">
+          <div style="font-weight:900;color:var(--primary);margin-bottom:8px">OEE Components</div>
+          <div class="chart-wrap"><canvas id="chartOee"></canvas></div>
+          <div class="small">Availability / Performance / Quality / OEE for the selected week.</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:900;color:var(--primary);margin-bottom:8px">OEE Assumptions</div>
+          <table>
+            <thead><tr><th>Family</th><th>Planned DT%</th><th>Speed loss%</th><th>Yield%</th></tr></thead>
+            <tbody id="tblAssumptions"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scenarios -->
+    <section id="scenarios">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-random"></i> Scenario Planner</h2>
+        <div class="badge">Base vs Selected</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card chart-card">
+          <div style="font-weight:900;color:var(--primary);margin-bottom:8px">Shortfall Comparison</div>
+          <div class="chart-wrap"><canvas id="chartScenarioCompare"></canvas></div>
+          <div class="small">Compare shortfall (units) by family vs Base.</div>
+        </div>
+
+        <div class="card">
+          <div style="font-weight:900;color:var(--primary);margin-bottom:8px">Scenario Table</div>
+          <table>
+            <thead><tr><th>Family</th><th>Demand</th><th>Good</th><th>Shortfall</th></tr></thead>
+            <tbody id="tblScenario"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Downloads -->
+    <section id="downloads">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fas fa-download"></i> Downloads &amp; Assumptions</h2>
+        <div class="badge">Project artifacts</div>
+      </div>
+
+      <div class="small">
         Download the generated Excel outputs and the assumptions document used for this simulation.
       </div>
-<div style="margin-top: 12px; display:flex; flex-wrap: wrap; gap: 10px;">
-<a class="download-link" download="" href="https://github.com/ADI3011-git/Project_Savory_Roots/operations/Weekly_Forecast_Plant_Level.xlsx">
-<i class="fas fa-file-excel"></i> Weekly Forecast (Plant)
+
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px">
+        <a class="download-link" download href="https://github.com/ADI3011-git/Project_Savory_Roots/operations/Weekly_Forecast_Plant_Level.xlsx">
+          <i class="fas fa-file-excel"></i> Weekly Forecast (Plant)
         </a>
-<a class="download-link" download="" href="https://github.com/ADI3011-git/Project_Savory_Roots/operations/Master_Production_Schedule.xlsx">
-<i class="fas fa-file-excel"></i> Master Production Schedule
+        <a class="download-link" download href="https://github.com/ADI3011-git/Project_Savory_Roots/operations/Master_Production_Schedule.xlsx">
+          <i class="fas fa-file-excel"></i> Master Production Schedule
         </a>
-<a class="download-link" download="" href="https://github.com/ADI3011-git/Project_Savory_Roots/operations/Production_Daily_Schedule.xlsx">
-<i class="fas fa-file-excel"></i> Daily Production Schedule
+        <a class="download-link" download href="https://github.com/ADI3011-git/Project_Savory_Roots/operations/Production_Daily_Schedule.xlsx">
+          <i class="fas fa-file-excel"></i> Daily Production Schedule
         </a>
-</div>
-</section>
-<footer>
-      SavoryRoots Provisions • Operations Module • Control Tower Dashboard
-    </footer>
-</div>
-<script>
-    /* ---------- DATA ---------- */
+      
+      </div>
+    </section>
+
+    <footer>SavoryRoots Provisions • Operations Module • Control Tower Dashboard</footer>
+  </div>
+
+  <script>
+    // ---------- DATA ----------
     const FAMILIES = ["Yogurt","Bakery","Muesli","Oil"];
 
-    // Expanded: all scenarios for all weeks (1–5)
-    const DATA_SCENARIO = [/* keep your existing expanded DATA_SCENARIO here exactly as before */
-{"scenario":"S0_Base","Week":1,"Family":"Yogurt","demand":40097,"good":38894,"shortfall":1203},{"scenario":"S1_DemandPlus20","Week":1,"Family":"Yogurt","demand":48116,"good":38894,"shortfall":9222},{"scenario":"S2_NoOvertime","Week":1,"Family":"Yogurt","demand":40097,"good":38894,"shortfall":1203},{"scenario":"S3_YogurtYieldDrop","Week":1,"Family":"Yogurt","demand":40097,"good":37691,"shortfall":2406},{"scenario":"S0_Base","Week":1,"Family":"Bakery","demand":30199,"good":28387,"shortfall":1812},{"scenario":"S1_DemandPlus20","Week":1,"Family":"Bakery","demand":36239,"good":28387,"shortfall":7852},{"scenario":"S2_NoOvertime","Week":1,"Family":"Bakery","demand":30199,"good":28387,"shortfall":1812},{"scenario":"S3_YogurtYieldDrop","Week":1,"Family":"Bakery","demand":30199,"good":28387,"shortfall":1812},{"scenario":"S0_Base","Week":1,"Family":"Muesli","demand":26554,"good":26023,"shortfall":531},{"scenario":"S1_DemandPlus20","Week":1,"Family":"Muesli","demand":31865,"good":26023,"shortfall":5842},{"scenario":"S2_NoOvertime","Week":1,"Family":"Muesli","demand":26554,"good":26023,"shortfall":531},{"scenario":"S3_YogurtYieldDrop","Week":1,"Family":"Muesli","demand":26554,"good":26023,"shortfall":531},{"scenario":"S0_Base","Week":1,"Family":"Oil","demand":2272,"good":334,"shortfall":1938},{"scenario":"S1_DemandPlus20","Week":1,"Family":"Oil","demand":2726,"good":334,"shortfall":2392},{"scenario":"S2_NoOvertime","Week":1,"Family":"Oil","demand":2272,"good":334,"shortfall":1938},{"scenario":"S3_YogurtYieldDrop","Week":1,"Family":"Oil","demand":2272,"good":334,"shortfall":1938},
-{"scenario":"S0_Base","Week":2,"Family":"Yogurt","demand":40491,"good":39276,"shortfall":1215},{"scenario":"S1_DemandPlus20","Week":2,"Family":"Yogurt","demand":48589,"good":39276,"shortfall":9313},{"scenario":"S2_NoOvertime","Week":2,"Family":"Yogurt","demand":40491,"good":39276,"shortfall":1215},{"scenario":"S3_YogurtYieldDrop","Week":2,"Family":"Yogurt","demand":40491,"good":38061,"shortfall":2430},{"scenario":"S0_Base","Week":2,"Family":"Bakery","demand":30238,"good":28424,"shortfall":1814},{"scenario":"S1_DemandPlus20","Week":2,"Family":"Bakery","demand":36286,"good":28424,"shortfall":7862},{"scenario":"S2_NoOvertime","Week":2,"Family":"Bakery","demand":30238,"good":28424,"shortfall":1814},{"scenario":"S3_YogurtYieldDrop","Week":2,"Family":"Bakery","demand":30238,"good":28424,"shortfall":1814},{"scenario":"S0_Base","Week":2,"Family":"Muesli","demand":26750,"good":26215,"shortfall":535},{"scenario":"S1_DemandPlus20","Week":2,"Family":"Muesli","demand":32100,"good":26215,"shortfall":5885},{"scenario":"S2_NoOvertime","Week":2,"Family":"Muesli","demand":26750,"good":26215,"shortfall":535},{"scenario":"S3_YogurtYieldDrop","Week":2,"Family":"Muesli","demand":26750,"good":26215,"shortfall":535},{"scenario":"S0_Base","Week":2,"Family":"Oil","demand":2273,"good":72,"shortfall":2201},{"scenario":"S1_DemandPlus20","Week":2,"Family":"Oil","demand":2728,"good":72,"shortfall":2656},{"scenario":"S2_NoOvertime","Week":2,"Family":"Oil","demand":2273,"good":72,"shortfall":2201},{"scenario":"S3_YogurtYieldDrop","Week":2,"Family":"Oil","demand":2273,"good":72,"shortfall":2201},
-{"scenario":"S0_Base","Week":3,"Family":"Yogurt","demand":40884,"good":39658,"shortfall":1226},{"scenario":"S1_DemandPlus20","Week":3,"Family":"Yogurt","demand":49061,"good":39658,"shortfall":9403},{"scenario":"S2_NoOvertime","Week":3,"Family":"Yogurt","demand":40884,"good":39658,"shortfall":1226},{"scenario":"S3_YogurtYieldDrop","Week":3,"Family":"Yogurt","demand":40884,"good":38432,"shortfall":2452},{"scenario":"S0_Base","Week":3,"Family":"Bakery","demand":30277,"good":28460,"shortfall":1817},{"scenario":"S1_DemandPlus20","Week":3,"Family":"Bakery","demand":36332,"good":28460,"shortfall":7872},{"scenario":"S2_NoOvertime","Week":3,"Family":"Bakery","demand":30277,"good":28460,"shortfall":1817},{"scenario":"S3_YogurtYieldDrop","Week":3,"Family":"Bakery","demand":30277,"good":28460,"shortfall":1817},{"scenario":"S0_Base","Week":3,"Family":"Muesli","demand":26947,"good":26408,"shortfall":539},{"scenario":"S1_DemandPlus20","Week":3,"Family":"Muesli","demand":32336,"good":26408,"shortfall":5928},{"scenario":"S2_NoOvertime","Week":3,"Family":"Muesli","demand":26947,"good":26408,"shortfall":539},{"scenario":"S3_YogurtYieldDrop","Week":3,"Family":"Muesli","demand":26947,"good":26408,"shortfall":539},{"scenario":"S0_Base","Week":3,"Family":"Oil","demand":2273,"good":0,"shortfall":2273},{"scenario":"S1_DemandPlus20","Week":3,"Family":"Oil","demand":2728,"good":0,"shortfall":2728},{"scenario":"S2_NoOvertime","Week":3,"Family":"Oil","demand":2273,"good":0,"shortfall":2273},{"scenario":"S3_YogurtYieldDrop","Week":3,"Family":"Oil","demand":2273,"good":0,"shortfall":2273},
-{"scenario":"S0_Base","Week":4,"Family":"Yogurt","demand":41278,"good":40039,"shortfall":1239},{"scenario":"S1_DemandPlus20","Week":4,"Family":"Yogurt","demand":49534,"good":40039,"shortfall":9495},{"scenario":"S2_NoOvertime","Week":4,"Family":"Yogurt","demand":41278,"good":40039,"shortfall":1239},{"scenario":"S3_YogurtYieldDrop","Week":4,"Family":"Yogurt","demand":41278,"good":38801,"shortfall":2477},{"scenario":"S0_Base","Week":4,"Family":"Bakery","demand":30316,"good":28496,"shortfall":1820},{"scenario":"S1_DemandPlus20","Week":4,"Family":"Bakery","demand":36379,"good":28496,"shortfall":7883},{"scenario":"S2_NoOvertime","Week":4,"Family":"Bakery","demand":30316,"good":28496,"shortfall":1820},{"scenario":"S3_YogurtYieldDrop","Week":4,"Family":"Bakery","demand":30316,"good":28496,"shortfall":1820},{"scenario":"S0_Base","Week":4,"Family":"Muesli","demand":27144,"good":26601,"shortfall":543},{"scenario":"S1_DemandPlus20","Week":4,"Family":"Muesli","demand":32573,"good":26601,"shortfall":5972},{"scenario":"S2_NoOvertime","Week":4,"Family":"Muesli","demand":27144,"good":26601,"shortfall":543},{"scenario":"S3_YogurtYieldDrop","Week":4,"Family":"Muesli","demand":27144,"good":26601,"shortfall":543},{"scenario":"S0_Base","Week":4,"Family":"Oil","demand":2274,"good":0,"shortfall":2274},{"scenario":"S1_DemandPlus20","Week":4,"Family":"Oil","demand":2729,"good":0,"shortfall":2729},{"scenario":"S2_NoOvertime","Week":4,"Family":"Oil","demand":2274,"good":0,"shortfall":2274},{"scenario":"S3_YogurtYieldDrop","Week":4,"Family":"Oil","demand":2274,"good":0,"shortfall":2274},
-{"scenario":"S0_Base","Week":5,"Family":"Yogurt","demand":10648,"good":10328,"shortfall":320},{"scenario":"S1_DemandPlus20","Week":5,"Family":"Yogurt","demand":12778,"good":10328,"shortfall":2450},{"scenario":"S2_NoOvertime","Week":5,"Family":"Yogurt","demand":10648,"good":10328,"shortfall":320},{"scenario":"S3_YogurtYieldDrop","Week":5,"Family":"Yogurt","demand":10648,"good":10009,"shortfall":639},{"scenario":"S0_Base","Week":5,"Family":"Bakery","demand":7163,"good":6733,"shortfall":430},{"scenario":"S1_DemandPlus20","Week":5,"Family":"Bakery","demand":8596,"good":6733,"shortfall":1863},{"scenario":"S2_NoOvertime","Week":5,"Family":"Bakery","demand":7163,"good":6733,"shortfall":430},{"scenario":"S3_YogurtYieldDrop","Week":5,"Family":"Bakery","demand":7163,"good":6733,"shortfall":430},{"scenario":"S0_Base","Week":5,"Family":"Muesli","demand":6998,"good":6858,"shortfall":140},{"scenario":"S1_DemandPlus20","Week":5,"Family":"Muesli","demand":8398,"good":6858,"shortfall":1540},{"scenario":"S2_NoOvertime","Week":5,"Family":"Muesli","demand":6998,"good":6858,"shortfall":140},{"scenario":"S3_YogurtYieldDrop","Week":5,"Family":"Muesli","demand":6998,"good":6858,"shortfall":140},{"scenario":"S0_Base","Week":5,"Family":"Oil","demand":1447,"good":630,"shortfall":817},{"scenario":"S1_DemandPlus20","Week":5,"Family":"Oil","demand":1736,"good":630,"shortfall":1106},{"scenario":"S2_NoOvertime","Week":5,"Family":"Oil","demand":1447,"good":630,"shortfall":817},{"scenario":"S3_YogurtYieldDrop","Week":5,"Family":"Oil","demand":1447,"good":630,"shortfall":817}
+    // NOTE: Keeping your original scenario/capacity/OEE blocks as-is.
+    // (Copied from your existing operations.html)
+    const DATASCENARIO = [
+      {"scenario":"S0Base","Week":1,"Family":"Yogurt","demand":40097,"good":38894,"shortfall":1203},
+      {"scenario":"S1DemandPlus20","Week":1,"Family":"Yogurt","demand":48116,"good":38894,"shortfall":9222},
+      {"scenario":"S2NoOvertime","Week":1,"Family":"Yogurt","demand":40097,"good":38894,"shortfall":1203},
+      {"scenario":"S3YogurtYieldDrop","Week":1,"Family":"Yogurt","demand":40097,"good":37691,"shortfall":2406},
+
+      {"scenario":"S0Base","Week":1,"Family":"Bakery","demand":30199,"good":28387,"shortfall":1812},
+      {"scenario":"S1DemandPlus20","Week":1,"Family":"Bakery","demand":36239,"good":28387,"shortfall":7852},
+      {"scenario":"S2NoOvertime","Week":1,"Family":"Bakery","demand":30199,"good":28387,"shortfall":1812},
+      {"scenario":"S3YogurtYieldDrop","Week":1,"Family":"Bakery","demand":30199,"good":28387,"shortfall":1812},
+
+      {"scenario":"S0Base","Week":1,"Family":"Muesli","demand":26554,"good":26023,"shortfall":531},
+      {"scenario":"S1DemandPlus20","Week":1,"Family":"Muesli","demand":31865,"good":26023,"shortfall":5842},
+      {"scenario":"S2NoOvertime","Week":1,"Family":"Muesli","demand":26554,"good":26023,"shortfall":531},
+      {"scenario":"S3YogurtYieldDrop","Week":1,"Family":"Muesli","demand":26554,"good":26023,"shortfall":531},
+
+      {"scenario":"S0Base","Week":1,"Family":"Oil","demand":2272,"good":334,"shortfall":1938},
+      {"scenario":"S1DemandPlus20","Week":1,"Family":"Oil","demand":2726,"good":334,"shortfall":2392},
+      {"scenario":"S2NoOvertime","Week":1,"Family":"Oil","demand":2272,"good":334,"shortfall":1938},
+      {"scenario":"S3YogurtYieldDrop","Week":1,"Family":"Oil","demand":2272,"good":334,"shortfall":1938},
+
+      {"scenario":"S0Base","Week":2,"Family":"Yogurt","demand":40491,"good":39276,"shortfall":1215},
+      {"scenario":"S1DemandPlus20","Week":2,"Family":"Yogurt","demand":48589,"good":39276,"shortfall":9313},
+      {"scenario":"S2NoOvertime","Week":2,"Family":"Yogurt","demand":40491,"good":39276,"shortfall":1215},
+      {"scenario":"S3YogurtYieldDrop","Week":2,"Family":"Yogurt","demand":40491,"good":38061,"shortfall":2430},
+
+      {"scenario":"S0Base","Week":2,"Family":"Bakery","demand":30238,"good":28424,"shortfall":1814},
+      {"scenario":"S1DemandPlus20","Week":2,"Family":"Bakery","demand":36286,"good":28424,"shortfall":7862},
+      {"scenario":"S2NoOvertime","Week":2,"Family":"Bakery","demand":30238,"good":28424,"shortfall":1814},
+      {"scenario":"S3YogurtYieldDrop","Week":2,"Family":"Bakery","demand":30238,"good":28424,"shortfall":1814},
+
+      {"scenario":"S0Base","Week":2,"Family":"Muesli","demand":26750,"good":26215,"shortfall":535},
+      {"scenario":"S1DemandPlus20","Week":2,"Family":"Muesli","demand":32100,"good":26215,"shortfall":5885},
+      {"scenario":"S2NoOvertime","Week":2,"Family":"Muesli","demand":26750,"good":26215,"shortfall":535},
+      {"scenario":"S3YogurtYieldDrop","Week":2,"Family":"Muesli","demand":26750,"good":26215,"shortfall":535},
+
+      {"scenario":"S0Base","Week":2,"Family":"Oil","demand":2273,"good":72,"shortfall":2201},
+      {"scenario":"S1DemandPlus20","Week":2,"Family":"Oil","demand":2728,"good":72,"shortfall":2656},
+      {"scenario":"S2NoOvertime","Week":2,"Family":"Oil","demand":2273,"good":72,"shortfall":2201},
+      {"scenario":"S3YogurtYieldDrop","Week":2,"Family":"Oil","demand":2273,"good":72,"shortfall":2201},
+
+      {"scenario":"S0Base","Week":3,"Family":"Yogurt","demand":40884,"good":39658,"shortfall":1226},
+      {"scenario":"S1DemandPlus20","Week":3,"Family":"Yogurt","demand":49061,"good":39658,"shortfall":9403},
+      {"scenario":"S2NoOvertime","Week":3,"Family":"Yogurt","demand":40884,"good":39658,"shortfall":1226},
+      {"scenario":"S3YogurtYieldDrop","Week":3,"Family":"Yogurt","demand":40884,"good":38432,"shortfall":2452},
+
+      {"scenario":"S0Base","Week":3,"Family":"Bakery","demand":30277,"good":28460,"shortfall":1817},
+      {"scenario":"S1DemandPlus20","Week":3,"Family":"Bakery","demand":36332,"good":28460,"shortfall":7872},
+      {"scenario":"S2NoOvertime","Week":3,"Family":"Bakery","demand":30277,"good":28460,"shortfall":1817},
+      {"scenario":"S3YogurtYieldDrop","Week":3,"Family":"Bakery","demand":30277,"good":28460,"shortfall":1817},
+
+      {"scenario":"S0Base","Week":3,"Family":"Muesli","demand":26947,"good":26408,"shortfall":539},
+      {"scenario":"S1DemandPlus20","Week":3,"Family":"Muesli","demand":32336,"good":26408,"shortfall":5928},
+      {"scenario":"S2NoOvertime","Week":3,"Family":"Muesli","demand":26947,"good":26408,"shortfall":539},
+      {"scenario":"S3YogurtYieldDrop","Week":3,"Family":"Muesli","demand":26947,"good":26408,"shortfall":539},
+
+      {"scenario":"S0Base","Week":3,"Family":"Oil","demand":2273,"good":0,"shortfall":2273},
+      {"scenario":"S1DemandPlus20","Week":3,"Family":"Oil","demand":2728,"good":0,"shortfall":2728},
+      {"scenario":"S2NoOvertime","Week":3,"Family":"Oil","demand":2273,"good":0,"shortfall":2273},
+      {"scenario":"S3YogurtYieldDrop","Week":3,"Family":"Oil","demand":2273,"good":0,"shortfall":2273},
+
+      {"scenario":"S0Base","Week":4,"Family":"Yogurt","demand":41278,"good":40039,"shortfall":1239},
+      {"scenario":"S1DemandPlus20","Week":4,"Family":"Yogurt","demand":49534,"good":40039,"shortfall":9495},
+      {"scenario":"S2NoOvertime","Week":4,"Family":"Yogurt","demand":41278,"good":40039,"shortfall":1239},
+      {"scenario":"S3YogurtYieldDrop","Week":4,"Family":"Yogurt","demand":41278,"good":38801,"shortfall":2477},
+
+      {"scenario":"S0Base","Week":4,"Family":"Bakery","demand":30316,"good":28496,"shortfall":1820},
+      {"scenario":"S1DemandPlus20","Week":4,"Family":"Bakery","demand":36379,"good":28496,"shortfall":7883},
+      {"scenario":"S2NoOvertime","Week":4,"Family":"Bakery","demand":30316,"good":28496,"shortfall":1820},
+      {"scenario":"S3YogurtYieldDrop","Week":4,"Family":"Bakery","demand":30316,"good":28496,"shortfall":1820},
+
+      {"scenario":"S0Base","Week":4,"Family":"Muesli","demand":27144,"good":26601,"shortfall":543},
+      {"scenario":"S1DemandPlus20","Week":4,"Family":"Muesli","demand":32573,"good":26601,"shortfall":5972},
+      {"scenario":"S2NoOvertime","Week":4,"Family":"Muesli","demand":27144,"good":26601,"shortfall":543},
+      {"scenario":"S3YogurtYieldDrop","Week":4,"Family":"Muesli","demand":27144,"good":26601,"shortfall":543},
+
+      {"scenario":"S0Base","Week":4,"Family":"Oil","demand":2274,"good":0,"shortfall":2274},
+      {"scenario":"S1DemandPlus20","Week":4,"Family":"Oil","demand":2729,"good":0,"shortfall":2729},
+      {"scenario":"S2NoOvertime","Week":4,"Family":"Oil","demand":2274,"good":0,"shortfall":2274},
+      {"scenario":"S3YogurtYieldDrop","Week":4,"Family":"Oil","demand":2274,"good":0,"shortfall":2274},
+
+      {"scenario":"S0Base","Week":5,"Family":"Yogurt","demand":10648,"good":10328,"shortfall":320},
+      {"scenario":"S1DemandPlus20","Week":5,"Family":"Yogurt","demand":12778,"good":10328,"shortfall":2450},
+      {"scenario":"S2NoOvertime","Week":5,"Family":"Yogurt","demand":10648,"good":10328,"shortfall":320},
+      {"scenario":"S3YogurtYieldDrop","Week":5,"Family":"Yogurt","demand":10648,"good":10009,"shortfall":639},
+
+      {"scenario":"S0Base","Week":5,"Family":"Bakery","demand":7163,"good":6733,"shortfall":430},
+      {"scenario":"S1DemandPlus20","Week":5,"Family":"Bakery","demand":8596,"good":6733,"shortfall":1863},
+      {"scenario":"S2NoOvertime","Week":5,"Family":"Bakery","demand":7163,"good":6733,"shortfall":430},
+      {"scenario":"S3YogurtYieldDrop","Week":5,"Family":"Bakery","demand":7163,"good":6733,"shortfall":430},
+
+      {"scenario":"S0Base","Week":5,"Family":"Muesli","demand":6998,"good":6858,"shortfall":140},
+      {"scenario":"S1DemandPlus20","Week":5,"Family":"Muesli","demand":8398,"good":6858,"shortfall":1540},
+      {"scenario":"S2NoOvertime","Week":5,"Family":"Muesli","demand":6998,"good":6858,"shortfall":140},
+      {"scenario":"S3YogurtYieldDrop","Week":5,"Family":"Muesli","demand":6998,"good":6858,"shortfall":140},
+
+      {"scenario":"S0Base","Week":5,"Family":"Oil","demand":1447,"good":630,"shortfall":817},
+      {"scenario":"S1DemandPlus20","Week":5,"Family":"Oil","demand":1736,"good":630,"shortfall":1106},
+      {"scenario":"S2NoOvertime","Week":5,"Family":"Oil","demand":1447,"good":630,"shortfall":817},
+      {"scenario":"S3YogurtYieldDrop","Week":5,"Family":"Oil","demand":1447,"good":630,"shortfall":817}
     ];
 
-    const DATA_CAPACITY = [
-      {Week:1, scheduled:60.00, base:48.00, capWithOt:72.00, util:1.25},
-      {Week:2, scheduled:60.00, base:48.00, capWithOt:72.00, util:1.25},
-      {Week:3, scheduled:59.19, base:48.00, capWithOt:72.00, util:1.23},
-      {Week:4, scheduled:58.45, base:48.00, capWithOt:72.00, util:1.22},
-      {Week:5, scheduled:22.80, base:48.00, capWithOt:48.00, util:0.47}
+    const DATACAPACITY = [
+      {"Week":1,"scheduled":60.00,"base":48.00,"capWithOt":72.00,"util":1.25},
+      {"Week":2,"scheduled":60.00,"base":48.00,"capWithOt":72.00,"util":1.25},
+      {"Week":3,"scheduled":59.19,"base":48.00,"capWithOt":72.00,"util":1.23},
+      {"Week":4,"scheduled":58.45,"base":48.00,"capWithOt":72.00,"util":1.22},
+      {"Week":5,"scheduled":22.80,"base":48.00,"capWithOt":48.00,"util":0.47}
     ];
 
-    const DATA_OEE = [
-      {Week:1, Family:"Yogurt", availability:93.0, performance:90.0, quality:97.0, oee:81.2},
-      {Week:1, Family:"Bakery", availability:91.0, performance:88.0, quality:94.0, oee:75.3},
-      {Week:1, Family:"Muesli", availability:95.0, performance:92.0, quality:98.0, oee:85.7},
-      {Week:1, Family:"Oil", availability:96.0, performance:94.0, quality:99.5, oee:89.8},
-      {Week:2, Family:"Yogurt", availability:93.0, performance:90.0, quality:97.0, oee:81.2},
-      {Week:2, Family:"Bakery", availability:91.0, performance:88.0, quality:94.0, oee:75.3},
-      {Week:2, Family:"Muesli", availability:95.0, performance:92.0, quality:98.0, oee:85.7},
-      {Week:2, Family:"Oil", availability:96.0, performance:94.0, quality:99.5, oee:89.8},
-      {Week:3, Family:"Yogurt", availability:93.0, performance:90.0, quality:97.0, oee:81.2},
-      {Week:3, Family:"Bakery", availability:91.0, performance:88.0, quality:94.0, oee:75.3},
-      {Week:3, Family:"Muesli", availability:95.0, performance:92.0, quality:98.0, oee:85.7},
-      {Week:3, Family:"Oil", availability:96.0, performance:94.0, quality:99.5, oee:89.8},
-      {Week:4, Family:"Yogurt", availability:93.0, performance:90.0, quality:97.0, oee:81.2},
-      {Week:4, Family:"Bakery", availability:91.0, performance:88.0, quality:94.0, oee:75.3},
-      {Week:4, Family:"Muesli", availability:95.0, performance:92.0, quality:98.0, oee:85.7},
-      {Week:4, Family:"Oil", availability:96.0, performance:94.0, quality:99.5, oee:89.8},
-      {Week:5, Family:"Yogurt", availability:93.0, performance:90.0, quality:97.0, oee:81.2},
-      {Week:5, Family:"Bakery", availability:91.0, performance:88.0, quality:94.0, oee:75.3},
-      {Week:5, Family:"Muesli", availability:95.0, performance:92.0, quality:98.0, oee:85.7},
-      {Week:5, Family:"Oil", availability:96.0, performance:94.0, quality:99.5, oee:89.8}
+    const DATAOEE = [
+      {"Week":1,"Family":"Yogurt","availability":93.0,"performance":90.0,"quality":97.0,"oee":81.2},
+      {"Week":1,"Family":"Bakery","availability":91.0,"performance":88.0,"quality":94.0,"oee":75.3},
+      {"Week":1,"Family":"Muesli","availability":95.0,"performance":92.0,"quality":98.0,"oee":85.7},
+      {"Week":1,"Family":"Oil","availability":96.0,"performance":94.0,"quality":99.5,"oee":89.8},
+
+      {"Week":2,"Family":"Yogurt","availability":93.0,"performance":90.0,"quality":97.0,"oee":81.2},
+      {"Week":2,"Family":"Bakery","availability":91.0,"performance":88.0,"quality":94.0,"oee":75.3},
+      {"Week":2,"Family":"Muesli","availability":95.0,"performance":92.0,"quality":98.0,"oee":85.7},
+      {"Week":2,"Family":"Oil","availability":96.0,"performance":94.0,"quality":99.5,"oee":89.8},
+
+      {"Week":3,"Family":"Yogurt","availability":93.0,"performance":90.0,"quality":97.0,"oee":81.2},
+      {"Week":3,"Family":"Bakery","availability":91.0,"performance":88.0,"quality":94.0,"oee":75.3},
+      {"Week":3,"Family":"Muesli","availability":95.0,"performance":92.0,"quality":98.0,"oee":85.7},
+      {"Week":3,"Family":"Oil","availability":96.0,"performance":94.0,"quality":99.5,"oee":89.8},
+
+      {"Week":4,"Family":"Yogurt","availability":93.0,"performance":90.0,"quality":97.0,"oee":81.2},
+      {"Week":4,"Family":"Bakery","availability":91.0,"performance":88.0,"quality":94.0,"oee":75.3},
+      {"Week":4,"Family":"Muesli","availability":95.0,"performance":92.0,"quality":98.0,"oee":85.7},
+      {"Week":4,"Family":"Oil","availability":96.0,"performance":94.0,"quality":99.5,"oee":89.8},
+
+      {"Week":5,"Family":"Yogurt","availability":93.0,"performance":90.0,"quality":97.0,"oee":81.2},
+      {"Week":5,"Family":"Bakery","availability":91.0,"performance":88.0,"quality":94.0,"oee":75.3},
+      {"Week":5,"Family":"Muesli","availability":95.0,"performance":92.0,"quality":98.0,"oee":85.7},
+      {"Week":5,"Family":"Oil","availability":96.0,"performance":94.0,"quality":99.5,"oee":89.8}
     ];
 
-    const DATA_ASSUMPTIONS = [
-      {Family:"Yogurt", plannedDT:6.0, speedLoss:10.0, yield:97.0},
-      {Family:"Bakery", plannedDT:8.0, speedLoss:12.0, yield:94.0},
-      {Family:"Muesli", plannedDT:5.0, speedLoss:8.0, yield:98.0},
-      {Family:"Oil", plannedDT:4.0, speedLoss:6.0, yield:99.5}
+    const DATAASSUMPTIONS = [
+      {"Family":"Yogurt","plannedDT":6.0,"speedLoss":10.0,"yield":97.0},
+      {"Family":"Bakery","plannedDT":8.0,"speedLoss":12.0,"yield":94.0},
+      {"Family":"Muesli","plannedDT":5.0,"speedLoss":8.0,"yield":98.0},
+      {"Family":"Oil","plannedDT":4.0,"speedLoss":6.0,"yield":99.5}
     ];
 
-    /* ---------- Schedule loaded from Excel ---------- */
-    const SCHEDULE_XLSX_URL = "./data/Production_Daily_Schedule.xlsx";
-    let DATA_SCHEDULE_REAL = []; // populated after load
+    // ---------- Schedule (embedded) ----------
+    // Embedded from your Production_Daily_Schedule.xlsx (non-empty rows)
+    const DATASCHEDULEREAL = [
+      {"Week":1,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 100g","Units":25162.34004793411,"ProdHrs":6.290585011983529,"ChgHrs":1.0},
+      {"Week":1,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 250g","Units":5982.952458057649,"ProdHrs":1.709414988016471,"ChgHrs":1.0},
+      {"Week":1,"Day":2,"Family":"Bakery","SKU":"Artisanal Bakery Toast 200g","Units":9884.639119274223,"ProdHrs":4.942319559637111,"ChgHrs":1.5},
+      {"Week":1,"Day":2,"Family":"Yogurt","SKU":"ProGut Yogurt 250g","Units":8951.88154060491,"ProdHrs":2.5576804403628897,"ChgHrs":1.0},
+      {"Week":1,"Day":3,"Family":"Bakery","SKU":"Artisanal Bakery Toast 200g","Units":8234.145332571005,"ProdHrs":4.117072666285502,"ChgHrs":1.5},
+      {"Week":1,"Day":3,"Family":"Bakery","SKU":"Artisanal Bakery Toast 400g","Units":5189.269199614568,"ProdHrs":2.8829269997858714,"ChgHrs":1.5},
+      {"Week":1,"Day":4,"Family":"Bakery","SKU":"Artisanal Bakery Toast 400g","Units":6890.678627416795,"ProdHrs":3.8281547930093303,"ChgHrs":1.5},
+      {"Week":1,"Day":4,"Family":"Muesli","SKU":"Heritage Grains Muesli 500g","Units":5507.767810749204,"ProdHrs":3.671845207166136,"ChgHrs":1.0},
+      {"Week":1,"Day":5,"Family":"Muesli","SKU":"Heritage Grains Muesli 500g","Units":11241.709362948019,"ProdHrs":7.494472908632013,"ChgHrs":1.0},
+      {"Week":1,"Day":6,"Family":"Muesli","SKU":"Heritage Grains Muesli 1kg","Units":9804.172516194245,"ProdHrs":8.170143763495204,"ChgHrs":1.0},
 
+      {"Week":2,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 100g","Units":25423.515943303867,"ProdHrs":6.355878985825967,"ChgHrs":1.0},
+      {"Week":2,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 250g","Units":9068.962352550682,"ProdHrs":2.591131560728766,"ChgHrs":1.0},
+      {"Week":2,"Day":2,"Family":"Bakery","SKU":"Artisanal Bakery Toast 200g","Units":10006.328721705736,"ProdHrs":5.003164360852868,"ChgHrs":1.5},
+      {"Week":2,"Day":2,"Family":"Yogurt","SKU":"ProGut Yogurt 250g","Units":5998.269600000001,"ProdHrs":1.7137913142857146,"ChgHrs":1.0},
+      {"Week":2,"Day":3,"Family":"Bakery","SKU":"Artisanal Bakery Toast 200g","Units":8334.513526141306,"ProdHrs":4.167256763070653,"ChgHrs":1.5},
+      {"Week":2,"Day":3,"Family":"Bakery","SKU":"Artisanal Bakery Toast 400g","Units":5232.992752093692,"ProdHrs":2.9072181956076067,"ChgHrs":1.5},
+      {"Week":2,"Day":4,"Family":"Bakery","SKU":"Artisanal Bakery Toast 400g","Units":6950.048490805552,"ProdHrs":3.861138050447529,"ChgHrs":1.5},
+      {"Week":2,"Day":4,"Family":"Muesli","SKU":"Heritage Grains Muesli 500g","Units":5586.804807264441,"ProdHrs":3.724536538176294,"ChgHrs":1.0},
+      {"Week":2,"Day":5,"Family":"Muesli","SKU":"Heritage Grains Muesli 500g","Units":11403.734265393819,"ProdHrs":7.602489510262546,"ChgHrs":1.0},
+      {"Week":2,"Day":6,"Family":"Muesli","SKU":"Heritage Grains Muesli 1kg","Units":9855.93807050875,"ProdHrs":8.213281725423957,"ChgHrs":1.0},
+
+      {"Week":3,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 100g","Units":25684.691838673625,"ProdHrs":6.421172959668406,"ChgHrs":1.0},
+      {"Week":3,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 250g","Units":9192.027647043713,"ProdHrs":2.6262936134410606,"ChgHrs":1.0},
+      {"Week":3,"Day":2,"Family":"Bakery","SKU":"Artisanal Bakery Toast 200g","Units":10128.018324137251,"ProdHrs":5.064009162068626,"ChgHrs":1.5},
+      {"Week":3,"Day":2,"Family":"Yogurt","SKU":"ProGut Yogurt 250g","Units":6013.586741942353,"ProdHrs":1.7181676405549581,"ChgHrs":1.0},
+      {"Week":3,"Day":3,"Family":"Bakery","SKU":"Artisanal Bakery Toast 200g","Units":8434.881719711608,"ProdHrs":4.217440859855804,"ChgHrs":1.5},
+      {"Week":3,"Day":3,"Family":"Bakery","SKU":"Artisanal Bakery Toast 400g","Units":5276.716304572816,"ProdHrs":2.931509391429342,"ChgHrs":1.5},
+      {"Week":3,"Day":4,"Family":"Bakery","SKU":"Artisanal Bakery Toast 400g","Units":7009.418354194308,"ProdHrs":3.8941213078857267,"ChgHrs":1.5},
+      {"Week":3,"Day":4,"Family":"Muesli","SKU":"Heritage Grains Muesli 500g","Units":5665.841803779678,"ProdHrs":3.777227869186452,"ChgHrs":1.0},
+      {"Week":3,"Day":5,"Family":"Muesli","SKU":"Heritage Grains Muesli 500g","Units":11565.75916783962,"ProdHrs":7.710506111893081,"ChgHrs":1.0},
+      {"Week":3,"Day":6,"Family":"Muesli","SKU":"Heritage Grains Muesli 1kg","Units":9907.703624823256,"ProdHrs":8.256419687352712,"ChgHrs":1.0},
+
+      {"Week":4,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 100g","Units":25945.867734043383,"ProdHrs":6.486466933510846,"ChgHrs":1.0},
+      {"Week":4,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 250g","Units":9315.092941536744,"ProdHrs":2.6614556661533556,"ChgHrs":1.0},
+      {"Week":4,"Day":2,"Family":"Bakery","SKU":"Artisanal Bakery Toast 200g","Units":10249.707926568767,"ProdHrs":5.1248539632843835,"ChgHrs":1.5},
+      {"Week":4,"Day":2,"Family":"Yogurt","SKU":"ProGut Yogurt 250g","Units":6028.903883884706,"ProdHrs":1.7225439668242017,"ChgHrs":1.0},
+      {"Week":4,"Day":3,"Family":"Bakery","SKU":"Artisanal Bakery Toast 200g","Units":8535.24991328191,"ProdHrs":4.267624956640955,"ChgHrs":1.5},
+      {"Week":4,"Day":3,"Family":"Bakery","SKU":"Artisanal Bakery Toast 400g","Units":5320.439857051941,"ProdHrs":2.9558005872510784,"ChgHrs":1.5},
+      {"Week":4,"Day":4,"Family":"Bakery","SKU":"Artisanal Bakery Toast 400g","Units":7068.788217583065,"ProdHrs":3.927104565323925,"ChgHrs":1.5},
+      {"Week":4,"Day":4,"Family":"Muesli","SKU":"Heritage Grains Muesli 500g","Units":5744.878800294915,"ProdHrs":3.82991920019661,"ChgHrs":1.0},
+      {"Week":4,"Day":5,"Family":"Muesli","SKU":"Heritage Grains Muesli 500g","Units":11727.78407028542,"ProdHrs":7.818522713523614,"ChgHrs":1.0},
+      {"Week":4,"Day":6,"Family":"Muesli","SKU":"Heritage Grains Muesli 1kg","Units":9959.469179137763,"ProdHrs":8.299557649281469,"ChgHrs":1.0},
+
+      {"Week":5,"Day":1,"Family":"Bakery","SKU":"Artisanal Bakery Toast 200g","Units":4066.0147640181277,"ProdHrs":2.033007382009064,"ChgHrs":1.5},
+      {"Week":5,"Day":1,"Family":"Oil","SKU":"Cold-Pressed Virgin Olive Oil 1L","Units":632.7453019454008,"ProdHrs":0.6327453019454008,"ChgHrs":1.0},
+      {"Week":5,"Day":1,"Family":"Muesli","SKU":"Heritage Grains Muesli 500g","Units":4356.476159815258,"ProdHrs":2.904317439876839,"ChgHrs":1.0},
+      {"Week":5,"Day":1,"Family":"Muesli","SKU":"Heritage Grains Muesli 1kg","Units":2641.6637285937757,"ProdHrs":2.201386440494813,"ChgHrs":1.0},
+      {"Week":5,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 100g","Units":6679.259055923268,"ProdHrs":1.669814763980817,"ChgHrs":1.0},
+      {"Week":5,"Day":1,"Family":"Yogurt","SKU":"ProGut Yogurt 250g","Units":3968.895434,"ProdHrs":1.133970124,"ChgHrs":1.0},
+      {"Week":5,"Day":2,"Family":"Bakery","SKU":"Artisanal Bakery Toast 400g","Units":3096.6337105852036,"ProdHrs":1.720351, "ChgHrs":1.5},
+      {"Week":5,"Day":2,"Family":"Oil","SKU":"Cold-Pressed Virgin Olive Oil 500ml","Units":813.8753500138594,"ProdHrs":0.8138753500138594,"ChgHrs":1.0}
+    ];
+
+    // ---------- Helpers ----------
     function fmtInt(n){ return Number(n).toLocaleString("en-IN"); }
     function getWeek(){ return Number(document.getElementById("weekSelectTop").value); }
     function getScenario(){ return document.getElementById("scenarioSelectTop").value; }
+    function rowsScenario(week, scenario){ return DATASCENARIO.filter(r => r.Week === week && r.scenario === scenario); }
+    function rowsBase(week){ return DATASCENARIO.filter(r => r.Week === week && r.scenario === "S0Base"); }
 
-    function rowsScenario(week, scenario){ return DATA_SCENARIO.filter(r => r.Week===week && r.scenario===scenario); }
-    function rowsBase(week){ return DATA_SCENARIO.filter(r => r.Week===week && r.scenario==="S0_Base"); }
-
-    function showScheduleError(msg){
-      const box = document.getElementById("scheduleError");
-      box.style.display = "block";
-      box.textContent = msg;
-      document.getElementById("scheduleStatus").textContent = "Schedule load failed.";
-    }
-    function clearScheduleError(){
-      const box = document.getElementById("scheduleError");
-      box.style.display = "none";
-      box.textContent = "";
-    }
-
-    async function loadScheduleFromXlsx(){
-      clearScheduleError();
-      const status = document.getElementById("scheduleStatus");
-      status.textContent = `Loading schedule from ${SCHEDULE_XLSX_URL} ...`;
-
-      try{
-        const res = await fetch(SCHEDULE_XLSX_URL);
-        if (!res.ok) throw new Error(`HTTP ${res.status} while fetching ${SCHEDULE_XLSX_URL}`);
-        const ab = await res.arrayBuffer();
-
-        const wb = XLSX.read(ab, { type: "array" });
-        const sheetName = wb.SheetNames[0];
-        const ws = wb.Sheets[sheetName];
-
-        // Raw JSON; keep blanks then filter
-        const raw = XLSX.utils.sheet_to_json(ws, { defval: null });
-
-        // Expect columns similar to file: Week, Day, Family, SKU, Changeover_hours, Prod_hours, Units_planned [file:43]
-        const cleaned = raw
-          .filter(r => r.Family && r.Week != null && r.Day != null && r.SKU)
-          .filter(r => r.Prod_hours != null && r.Units_planned != null && r.Changeover_hours != null)
-          .map(r => ({
-            Week: Number(r.Week),
-            Day: Number(r.Day),
-            Family: String(r.Family),
-            SKU: String(r.SKU),
-            Units: Number(r.Units_planned),
-            ProdHrs: Number(r.Prod_hours),
-            ChgHrs: Number(r.Changeover_hours),
-          }))
-          .filter(r => Number.isFinite(r.Week) && Number.isFinite(r.Day));
-
-        DATA_SCHEDULE_REAL = cleaned.sort((a,b) =>
-          (a.Week-b.Week) || (a.Day-b.Day) || a.Family.localeCompare(b.Family) || a.SKU.localeCompare(b.SKU)
-        );
-
-        status.textContent = `Loaded ${DATA_SCHEDULE_REAL.length} schedule rows from Excel.`;
-      } catch (e){
-        showScheduleError(
-          `Could not load/parse the Excel schedule.\n` +
-          `Fix: (1) Ensure the file exists at ${SCHEDULE_XLSX_URL}\n` +
-          `and (2) open this page via a local server (VS Code Live Server), not file://.\n` +
-          `Error: ${e.message}`
-        );
-        DATA_SCHEDULE_REAL = [];
-      }
-    }
-
-    /* ---------- Charts ---------- */
+    // ---------- Charts ----------
     let chartServiceRisk, chartDemandVsGood, chartCapacity, chartOee, chartScenarioCompare;
-    function safeDestroy(ch){ if (ch) ch.destroy(); }
+    function safeDestroy(ch){ if(ch) ch.destroy(); }
 
     function renderCharts(week, scenario){
       const rows = rowsScenario(week, scenario);
       const base = rowsBase(week);
 
       const labels = FAMILIES;
-      const demand = labels.map(f => (rows.find(r=>r.Family===f)?.demand ?? 0));
-      const good = labels.map(f => (rows.find(r=>r.Family===f)?.good ?? 0));
-      const shortfall = labels.map(f => (rows.find(r=>r.Family===f)?.shortfall ?? 0));
-      const baseShortfall = labels.map(f => (base.find(r=>r.Family===f)?.shortfall ?? 0));
+      const demand = labels.map(f => rows.find(r=>r.Family===f)?.demand ?? 0);
+      const good = labels.map(f => rows.find(r=>r.Family===f)?.good ?? 0);
+      const shortfall = labels.map(f => rows.find(r=>r.Family===f)?.shortfall ?? 0);
+      const baseShortfall = labels.map(f => base.find(r=>r.Family===f)?.shortfall ?? 0);
 
       safeDestroy(chartServiceRisk);
       chartServiceRisk = new Chart(document.getElementById("chartServiceRisk"), {
         type:"bar",
-        data:{labels,datasets:[
-          {label:"Demand",data:demand,backgroundColor:"rgba(44,85,48,0.75)"},
-          {label:"Good output",data:good,backgroundColor:"rgba(115,158,130,0.75)"},
-          {label:"Shortfall",data:shortfall,backgroundColor:"rgba(220,53,69,0.55)"}
+        data:{ labels, datasets:[
+          {label:"Demand", data:demand, backgroundColor:"rgba(44,85,48,0.75)"},
+          {label:"Good output", data:good, backgroundColor:"rgba(115,158,130,0.75)"},
+          {label:"Shortfall", data:shortfall, backgroundColor:"rgba(220,53,69,0.55)"}
         ]},
-        options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
       });
 
       safeDestroy(chartDemandVsGood);
       chartDemandVsGood = new Chart(document.getElementById("chartDemandVsGood"), {
         type:"bar",
-        data:{labels,datasets:[
-          {label:"Demand",data:demand,backgroundColor:"rgba(44,85,48,0.75)"},
-          {label:"Good output",data:good,backgroundColor:"rgba(115,158,130,0.75)"}
+        data:{ labels, datasets:[
+          {label:"Demand", data:demand, backgroundColor:"rgba(44,85,48,0.75)"},
+          {label:"Good output", data:good, backgroundColor:"rgba(115,158,130,0.75)"}
         ]},
-        options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
       });
 
       safeDestroy(chartCapacity);
       chartCapacity = new Chart(document.getElementById("chartCapacity"), {
         type:"line",
         data:{
-          labels:DATA_CAPACITY.map(d=>"W"+d.Week),
+          labels: DATACAPACITY.map(d=>`W${d.Week}`),
           datasets:[
-            {label:"Scheduled hrs",data:DATA_CAPACITY.map(d=>d.scheduled),borderColor:"#2c5530",backgroundColor:"rgba(44,85,48,0.15)",fill:true,tension:0.2},
-            {label:"Capacity w/ OT",data:DATA_CAPACITY.map(d=>d.capWithOt),borderColor:"#d8b65c",backgroundColor:"rgba(216,182,92,0.12)",fill:true,tension:0.2}
+            {label:"Scheduled hrs", data:DATACAPACITY.map(d=>d.scheduled), borderColor:"#2c5530", backgroundColor:"rgba(44,85,48,0.15)", fill:true, tension:0.2},
+            {label:"Capacity w/ OT", data:DATACAPACITY.map(d=>d.capWithOt), borderColor:"#d8b65c", backgroundColor:"rgba(216,182,92,0.12)", fill:true, tension:0.2}
           ]
         },
-        options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
       });
 
-      const oeeRows = DATA_OEE.filter(r=>r.Week===week);
-      const avail = labels.map(f => (oeeRows.find(r=>r.Family===f)?.availability ?? 0));
-      const perf  = labels.map(f => (oeeRows.find(r=>r.Family===f)?.performance ?? 0));
-      const qual  = labels.map(f => (oeeRows.find(r=>r.Family===f)?.quality ?? 0));
-      const oee   = labels.map(f => (oeeRows.find(r=>r.Family===f)?.oee ?? 0));
+      const oeeRows = DATAOEE.filter(r => r.Week === week);
+      const avail = labels.map(f => oeeRows.find(r=>r.Family===f)?.availability ?? 0);
+      const perf  = labels.map(f => oeeRows.find(r=>r.Family===f)?.performance ?? 0);
+      const qual  = labels.map(f => oeeRows.find(r=>r.Family===f)?.quality ?? 0);
+      const oee   = labels.map(f => oeeRows.find(r=>r.Family===f)?.oee ?? 0);
 
       safeDestroy(chartOee);
       chartOee = new Chart(document.getElementById("chartOee"), {
         type:"bar",
-        data:{labels,datasets:[
-          {label:"Availability %",data:avail,backgroundColor:"rgba(44,85,48,0.75)"},
-          {label:"Performance %",data:perf,backgroundColor:"rgba(115,158,130,0.75)"},
-          {label:"Quality %",data:qual,backgroundColor:"rgba(216,182,92,0.75)"},
-          {label:"OEE %",data:oee,backgroundColor:"rgba(33,37,41,0.55)"}
+        data:{ labels, datasets:[
+          {label:"Availability", data:avail, backgroundColor:"rgba(44,85,48,0.75)"},
+          {label:"Performance", data:perf, backgroundColor:"rgba(115,158,130,0.75)"},
+          {label:"Quality", data:qual, backgroundColor:"rgba(216,182,92,0.75)"},
+          {label:"OEE", data:oee, backgroundColor:"rgba(33,37,41,0.55)"}
         ]},
-        options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true,max:100}}}
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, max:100 } } }
       });
 
       safeDestroy(chartScenarioCompare);
       chartScenarioCompare = new Chart(document.getElementById("chartScenarioCompare"), {
         type:"bar",
-        data:{labels,datasets:[
-          {label:"Base shortfall",data:baseShortfall,backgroundColor:"rgba(108,117,125,0.55)"},
-          {label:"Selected shortfall",data:shortfall,backgroundColor:"rgba(220,53,69,0.65)"}
+        data:{ labels, datasets:[
+          {label:"Base shortfall", data:baseShortfall, backgroundColor:"rgba(108,117,125,0.55)"},
+          {label:"Selected shortfall", data:shortfall, backgroundColor:"rgba(220,53,69,0.65)"}
         ]},
-        options:{responsive:true,maintainAspectRatio:false,scales:{y:{beginAtZero:true}}}
+        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
       });
     }
 
-    /* ---------- Tables + KPIs ---------- */
+    // ---------- Tables / KPIs ----------
     function renderTablesAndKpis(week, scenario){
       const rows = rowsScenario(week, scenario);
-
-      const demandTotal = rows.reduce((a,r)=>a+r.demand, 0);
-      const goodTotal = rows.reduce((a,r)=>a+r.good, 0);
-      const shortfallTotal = rows.reduce((a,r)=>a+r.shortfall, 0);
+      const demandTotal = rows.reduce((a,r)=>a + (r.demand||0), 0);
+      const goodTotal = rows.reduce((a,r)=>a + (r.good||0), 0);
+      const shortfallTotal = rows.reduce((a,r)=>a + (r.shortfall||0), 0);
 
       document.getElementById("kpiDemand").textContent = fmtInt(demandTotal);
       document.getElementById("kpiGood").textContent = fmtInt(goodTotal);
       document.getElementById("kpiShortfall").textContent = fmtInt(shortfallTotal);
 
-      const cap = DATA_CAPACITY.find(d => d.Week===week);
-      const utilWithOt = cap ? (cap.scheduled / cap.capWithOt) : null;
-      document.getElementById("kpiUtil").textContent =
-        utilWithOt !== null ? (Math.round(utilWithOt*100) + "%") : "—";
+      const cap = DATACAPACITY.find(d => d.Week === week);
+      const utilWithOt = cap ? cap.scheduled / cap.capWithOt : null;
+      document.getElementById("kpiUtil").textContent = utilWithOt != null ? `${Math.round(utilWithOt*100)}%` : "—";
 
       const dot = document.getElementById("statusDot");
       const txt = document.getElementById("statusText");
-      if (shortfallTotal <= 2000) { dot.style.background="#28a745"; txt.textContent="Healthy"; }
-      else if (shortfallTotal <= 8000) { dot.style.background="#ffc107"; txt.textContent="Watch"; }
-      else { dot.style.background="#dc3545"; txt.textContent="At risk"; }
+      if(shortfallTotal < 2000){ dot.style.background = "#28a745"; txt.textContent = "Healthy"; }
+      else if(shortfallTotal < 8000){ dot.style.background = "#ffc107"; txt.textContent = "Watch"; }
+      else { dot.style.background = "#dc3545"; txt.textContent = "At risk"; }
 
+      // Demand table
       const tb1 = document.getElementById("tblDemandMps");
       tb1.innerHTML = "";
-      for (const f of FAMILIES){
-        const r = rows.find(x=>x.Family===f);
+      for(const f of FAMILIES){
+        const r = rows.find(x=>x.Family===f) || {};
         const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${f}</td>
-          <td>${fmtInt(r?.demand ?? 0)}</td>
-          <td>${fmtInt(r?.good ?? 0)}</td>
-          <td>${fmtInt(r?.shortfall ?? 0)}</td>
-        `;
+        tr.innerHTML = `<td>${f}</td><td>${fmtInt(r.demand||0)}</td><td>${fmtInt(r.good||0)}</td><td>${fmtInt(r.shortfall||0)}</td>`;
         tb1.appendChild(tr);
       }
+
+      // Scenario table: same as demand
       document.getElementById("tblScenario").innerHTML = tb1.innerHTML;
 
+      // Capacity table
       const tb2 = document.getElementById("tblCapacity");
       tb2.innerHTML = "";
-      for (const r of DATA_CAPACITY){
-        const remaining = (r.capWithOt - r.scheduled);
+      for(const r of DATACAPACITY){
+        const remaining = r.capWithOt - r.scheduled;
         const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>W${r.Week}</td>
-          <td>${r.scheduled.toFixed(2)}</td>
-          <td>${Math.round(r.util*100)}%</td>
-          <td>${(r.capWithOt - r.base).toFixed(2)}</td>
-          <td>${remaining.toFixed(2)}</td>
-        `;
+        tr.innerHTML = `<td>W${r.Week}</td><td>${r.scheduled.toFixed(2)}</td><td>${Math.round(r.util*100)}%</td><td>${(r.capWithOt - r.base).toFixed(2)}</td><td>${remaining.toFixed(2)}</td>`;
         tb2.appendChild(tr);
       }
 
+      // Alerts
       const alerts = document.getElementById("alertsList");
       alerts.innerHTML = "";
       const util = utilWithOt ?? 0;
+      if(util > 0.95){
+        alerts.innerHTML += `<li><i class="fas fa-bell" style="color:#b8860b"></i><div><b>High utilization</b> ${Math.round(util*100)}% of OT-adjusted capacity.</div></li>`;
+      } else {
+        alerts.innerHTML += `<li><i class="fas fa-check-circle" style="color:#28a745"></i><div><b>Capacity OK</b> ${Math.round(util*100)}% of OT-adjusted capacity.</div></li>`;
+      }
+      if(shortfallTotal > 0){
+        alerts.innerHTML += `<li><i class="fas fa-truck-loading" style="color:#dc3545"></i><div><b>Service risk</b> ${fmtInt(shortfallTotal)} units shortfall in this view.</div></li>`;
+      }
 
-      if (util > 0.95) alerts.innerHTML += `<li><i class="fas fa-bell" style="color:#b8860b"></i><div><b>High utilization:</b> ${Math.round(util*100)}% of OT-adjusted capacity.</div></li>`;
-      else alerts.innerHTML += `<li><i class="fas fa-check-circle" style="color:#28a745"></i><div><b>Capacity OK:</b> ${Math.round(util*100)}% of OT-adjusted capacity.</div></li>`;
-
-      if (shortfallTotal > 0) alerts.innerHTML += `<li><i class="fas fa-truck-loading" style="color:#dc3545"></i><div><b>Service risk:</b> ${fmtInt(shortfallTotal)} units shortfall in this view.</div></li>`;
-
+      // Assumptions table
       const tbA = document.getElementById("tblAssumptions");
       tbA.innerHTML = "";
-      for (const a of DATA_ASSUMPTIONS){
+      for(const a of DATAASSUMPTIONS){
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td>${a.Family}</td><td>${a.plannedDT.toFixed(1)}%</td><td>${a.speedLoss.toFixed(1)}%</td><td>${a.yield.toFixed(1)}%</td>`;
+        tr.innerHTML = `<td>${a.Family}</td><td>${a.plannedDT.toFixed(1)}</td><td>${a.speedLoss.toFixed(1)}</td><td>${a.yield.toFixed(1)}</td>`;
         tbA.appendChild(tr);
       }
 
-      // Schedule table (from Excel-loaded DATA_SCHEDULE_REAL)
+      // Schedule table from embedded DATASCHEDULEREAL
       const familySel = document.getElementById("familyFilter").value;
-      const schedRows = DATA_SCHEDULE_REAL
+      const schedRows = DATASCHEDULEREAL
         .filter(r => r.Week === week)
         .filter(r => familySel === "All" ? true : r.Family === familySel);
 
       const tbSch = document.getElementById("tblSchedule");
       tbSch.innerHTML = "";
-      if (!schedRows.length){
-        tbSch.innerHTML = `<tr><td colspan="6" style="color:#6c757d;">No schedule rows for this selection (or file not loaded).</td></tr>`;
+      if(!schedRows.length){
+        tbSch.innerHTML = `<tr><td colspan="6" style="color:#6c757d">No schedule rows for this selection.</td></tr>`;
       } else {
-        for (const r of schedRows){
+        for(const r of schedRows){
           const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${r.Day}</td>
-            <td>${r.Family}</td>
-            <td>${r.SKU}</td>
-            <td>${fmtInt(Math.round(r.Units))}</td>
-            <td>${Number(r.ProdHrs).toFixed(2)}</td>
-            <td>${Number(r.ChgHrs).toFixed(2)}</td>
-          `;
+          tr.innerHTML = `<td>${r.Day}</td><td>${r.Family}</td><td>${r.SKU}</td><td>${fmtInt(Math.round(r.Units))}</td><td>${Number(r.ProdHrs).toFixed(2)}</td><td>${Number(r.ChgHrs).toFixed(2)}</td>`;
           tbSch.appendChild(tr);
         }
       }
+    }
+
+    function initEmbeddedScheduleStatus(){
+      const status = document.getElementById("scheduleStatus");
+      if(status) status.textContent = `Loaded ${DATASCHEDULEREAL.length} schedule rows (embedded).`;
+      const box = document.getElementById("scheduleError");
+      if(box){ box.style.display = "none"; box.textContent = ""; }
     }
 
     function updateAll(){
@@ -756,18 +789,13 @@
       renderTablesAndKpis(week, scenario);
     }
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      // Load Excel schedule first (so the schedule table is real)
-      await loadScheduleFromXlsx();
-
+    document.addEventListener("DOMContentLoaded", () => {
+      initEmbeddedScheduleStatus();
       document.getElementById("weekSelectTop").addEventListener("change", updateAll);
       document.getElementById("scenarioSelectTop").addEventListener("change", updateAll);
       document.getElementById("familyFilter").addEventListener("change", updateAll);
-
       updateAll();
     });
   </script>
 </body>
 </html>
-
-
